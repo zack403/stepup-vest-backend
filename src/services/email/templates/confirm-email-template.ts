@@ -121,7 +121,7 @@ export function ConfirmEmail(user: UserEntity, link): string {
                       colspan="2"
                       style="text-align: center; padding-bottom: 20px"
                     >
-                      <a href="${link}"></a>
+                      <a href="${link}"> ${link} </a>
                     </td>
                   </tr>
                 </tbody>

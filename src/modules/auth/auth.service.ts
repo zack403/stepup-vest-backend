@@ -281,15 +281,12 @@ export class AuthService {
 
   async createForgottenPasswordToken(userId: string): Promise<PasswordReset> {
 
-    const resetToken = await this.jwtService.sign({ userId }, {
-      secret: this.configService.get('JWT_SECRETKEY'),
-      expiresIn: this.configService.get('JWT_EXPIRESIN')
-    })
+    const resetToken = generateUniqueCode();
 
     const forgottenPasswordPayload: PasswordReset = {
       userId,
       resetToken,
-      createdBy: 'da'
+      createdBy: 'vest admin'
     }
     const forgottenPasswordModel = await this.passwordResetRepo.save(forgottenPasswordPayload);
     if (forgottenPasswordModel) {
