@@ -28,6 +28,7 @@ export class RegisterDto {
     @IsString()
     @ApiProperty()
     @IsNotEmpty()
+    @Matches(/^[0-9]*$/, {message: 'phoneNumber Number should be of type number'})
     phoneNumber: string;
 
     @IsString()

@@ -1,9 +1,10 @@
-import { Controller, Get, Body, Param, Req, Res, Put, UseGuards} from '@nestjs/common';
+import { Controller, Get, Body, Param, Req, Res, Put, UseGuards, Post} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { AddBankDetailsDto } from './dto/add-bank-details.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -12,6 +13,31 @@ import { AuthGuard } from '@nestjs/passport';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+
+  @Post('/bank-details')
+  @ApiOperation({summary: 'Add users bank details'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Bank Successfully added' })
+  async addBankDetails(
+      @Res() res: Response, 
+      @Body() payload: AddBankDetailsDto,
+      @Req() req: any) : Promise<void> 
+  {
+    const result = await this.userService.addBankDetails(payload, req.user);
+    res.status(result.status).json(result);
+  }
+
+  @Get('/bank-details')
+  @ApiOperation({summary: 'fetch users bank details'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Bank Successfully fetched' })
+  async getBankDetails(
+      @Res() res: Response,
+      @Req() req: any) : Promise<void> 
+  {
+    const result = await this.userService.getBankDetails(req.user);
+    res.status(result.status).json(result);
+  }
 
 
   @Get()

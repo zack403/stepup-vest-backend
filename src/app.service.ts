@@ -5,4 +5,8 @@ export class AppService {
   getHello(): string {
     return 'Welcome to Stepup Vest api!';
   }
+
+  getBanks() {
+    
+  }
 }
