@@ -48,13 +48,16 @@ export class AuthService {
 
       await queryRunner.connect();
       await queryRunner.startTransaction();
+      
 
       const hashedPassword = await hashPassword(request.password);
       
+      delete request.confirmPassword;
 
       const userData = plainToClass(UserEntity, request);
-      userData.createdBy = request.fullName;
+      userData.createdBy = request.email;
       userData.password = hashedPassword;
+
 
       const saved = await queryRunner.manager.save(UserEntity, userData);
 
@@ -73,15 +76,33 @@ export class AuthService {
 
       await queryRunner.commitTransaction();
 
+      //generate auth token
+      const { id, email, firstName, lastName} = saved;
+      const fullName = `${firstName} ${lastName}`
+      const jwt: JwtPayload = { id, email, fullName };
+      const token = await this.jwtService.sign(jwt, {
+        secret: this.configService.get('JWT_SECRETKEY'),
+        expiresIn: this.configService.get('JWT_EXPIRESIN')
+      });
+
+      delete saved.password;
+
+
+      const dataToReturn = {
+        token,
+        ...saved
+      }
+
       return ({
         status: HttpStatus.OK,
-        message: 'Account created successfully, kindly check your email to verify your email.'
+        message: 'Account created successfully, kindly check your email to verify your email.',
+        data: dataToReturn
       });
 
     } catch (error) {
 
       await queryRunner.rollbackTransaction();
-      this.logger.log(`Error in creating account - ${error.message}`, "AuthSvc.Register");
+      this.logger.error(`Error in creating account - ${error.message}`, "AuthSvc.Register");
 
       return ({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -115,19 +136,19 @@ export class AuthService {
       }
 
       //generate auth token
-      const { id, email, fullName} = user;
-      const payload: JwtPayload = { id, email, fullName };
-      const token = await this.jwtService.sign(payload, {
+      const { id, email, firstName, lastName} = user;
+      const fullName = `${firstName} ${lastName}`
+      const jwt: JwtPayload = { id, email, fullName };
+      const token = await this.jwtService.sign(jwt, {
         secret: this.configService.get('JWT_SECRETKEY'),
         expiresIn: this.configService.get('JWT_EXPIRESIN')
       });
 
+      delete user.password;
 
       const dataToReturn = {
         token,
-        id,
-        email,
-        fullName
+        ...user
       }
 
       return clientFeedback({
@@ -192,7 +213,7 @@ export class AuthService {
 
       }
     } catch (error) {
-      this.logger.log(`Error in creating email token - ${error.message}`, "AuthSvc.creatEmailToken")
+      this.logger.error(`Error in creating email token - ${error.message}`, "AuthSvc.creatEmailToken")
     }
 
   }
@@ -243,18 +264,17 @@ export class AuthService {
         await this.emailVerifRepo.delete({ id: result.id });
 
         //generate auth token
-        const { id, email, fullName } = user;
-        const payload: JwtPayload = { id, email, fullName};
-        const token = await this.jwtService.sign(payload, {
-          secret: this.configService.get('JWT_SECRETKEY'),
-          expiresIn: this.configService.get('JWT_EXPIRESIN')
-        });
+        const { id, email, firstName, lastName} = user;
+      const fullName = `${firstName} ${lastName}`;
+      const jwt: JwtPayload = { id, email, fullName };
+      const token = await this.jwtService.sign(jwt, {
+        secret: this.configService.get('JWT_SECRETKEY'),
+        expiresIn: this.configService.get('JWT_EXPIRESIN')
+      });
 
         const dataToReturn = {
           token,
-          id,
-          email,
-          fullName
+          ...user
         }
 
         return clientFeedback({
@@ -264,7 +284,7 @@ export class AuthService {
         });
 
       } catch (error) {
-        this.logger.log(`Error in verifying email - ${error.message}`, "AuthSvc.verifyEmail")
+        this.logger.error(`Error in verifying email - ${error.message}`, "AuthSvc.verifyEmail")
 
         return clientFeedback({
           message: `An error occurred while trying to verify email - Error: ${error.message}`,

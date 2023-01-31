@@ -37,16 +37,22 @@ export class UserService {
 
           const data = plainToClass(BankDetailsEntity, req);
           data.createdBy = user.email;
+          data.userId = user.id;
     
-          await this.bdRepo.save(data);
+          const saved = await this.bdRepo.save(data);
 
           return clientFeedback({
             status: 200,
-            message: 'Bank account added successfully'
+            message: 'Bank account added successfully',
+            data: saved
           })
 
       } catch (error) {
         this.logger.log(`Something failed - ${error.message}`);
+        return clientFeedback({
+          message: `An error occured while adding bank details - Error: ${error.message}`,
+          status: 500
+        });
         
       }
       
@@ -71,8 +77,11 @@ export class UserService {
       this.logger.log(`Something failed - ${error.message}`);
       
     }
-    
+}
 
+async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
+  const bankD = await this.bdRepo.findOne({where: {userId}});
+  return bankD;
 }
  
   async findAll(user: UserEntity): Promise<IClientReturnObject> {
@@ -141,12 +150,13 @@ export class UserService {
       user.updatedBy = user.updatedBy || user.createdBy;
   
     
-      const updated = plainToClassFromExist(user, payload);
-      await this.userRepo.save(updated);
+      const dataToUpdated = plainToClassFromExist(user, payload);
+      const updated = await this.userRepo.save(dataToUpdated);
 
       return clientFeedback({
         message: "Successfully updated",
-        status: 200
+        status: 200,
+        data: updated
       });
 
     } catch (error) {
@@ -158,6 +168,10 @@ export class UserService {
       })
     }
     
+  }
+
+  async verifyBVN(userId): Promise<void> {
+    await this.userRepo.update({id: userId}, {bvnVerified: true});
   }
   
   async validateUser(payload: JwtPayload): Promise<UserEntity> {

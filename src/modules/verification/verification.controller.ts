@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { VerificationService } from './verification.service';
+import { AddBVNDto } from './dto/add-bvn.dto';
 
 @ApiTags('Verification')
 @ApiBearerAuth()
@@ -18,11 +19,11 @@ export class VerificationController {
   @ApiResponse({ status: 201, description: 'BVN Successfully verified' })
   async verifyBVN(
       @Res() res: Response, 
-      @Body() bvn: string,
+      @Body() payload: AddBVNDto,
       @Req() req: any) : Promise<void> 
   {
-    // const result = await this.verifySvc.verifyBVN(bvn, req.user);
-    // res.status(result.status).json(result);
+    const result = await this.verifySvc.verifyBVN(payload.bvn, req.user);
+    res.status(result.status).json(result);
   }
  
 }

@@ -20,10 +20,17 @@ export class RegisterDto {
 
     @IsString()
     @ApiProperty()
-    @MinLength(3, {message: 'fullName should be minimum 3 characters long'})
-    @MaxLength(50, {message: 'fullName should be maximum 70 characters long'})  
+    @MinLength(3, {message: 'firstName should be minimum 3 characters long'})
+    @MaxLength(50, {message: 'firstName should be maximum 70 characters long'})  
     @IsNotEmpty()
-    fullName: string;
+    firstName: string;
+
+    @IsString()
+    @ApiProperty()
+    @MinLength(3, {message: 'lastName should be minimum 3 characters long'})
+    @MaxLength(50, {message: 'lastName should be maximum 70 characters long'})  
+    @IsNotEmpty()
+    lastName: string;
 
     @IsString()
     @ApiProperty()
@@ -32,7 +39,7 @@ export class RegisterDto {
     phoneNumber: string;
 
     @IsString()
-    @ApiProperty()
+    @ApiProperty({default: 'facebook'})
     @IsNotEmpty()
     heardAboutUs: string;
     

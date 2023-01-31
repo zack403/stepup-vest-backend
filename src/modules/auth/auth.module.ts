@@ -10,6 +10,7 @@ import { EmailVerificationEntity } from './entities/email-verification.entity';
 import { PasswordResetEntity } from './entities/password-reset.entity';
 import { EmailService } from '../../services/email/email.service';
 import { UserService } from '../user/user.service';
+import { BankDetailsEntity } from '../user/entities/bank-details.entity';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { UserService } from '../user/user.service';
     TypeOrmModule.forFeature([
       UserEntity,
       EmailVerificationEntity,
-      PasswordResetEntity
+      PasswordResetEntity,
+      BankDetailsEntity
     ])
   ],
   controllers: [AuthController],
