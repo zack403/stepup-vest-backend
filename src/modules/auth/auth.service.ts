@@ -118,7 +118,7 @@ export class AuthService {
 
     try {
 
-      const user = await this.userRepo.findOne({ where: { email: request.email.toLocaleLowerCase() }, relations: ['business', 'business.businessClasses', 'business.locations'] });
+      const user = await this.userRepo.findOne({ where: { email: request.email.toLocaleLowerCase() }});
       if (!user) {
         return clientFeedback({
           message: 'Login Failed, invalid email or password.',
