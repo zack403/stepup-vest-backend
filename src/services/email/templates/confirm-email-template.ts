@@ -102,7 +102,7 @@ export function ConfirmEmail(user: UserEntity, link): string {
                       colspan="2"
                       style="padding: 40px 0px 10px 0px; font-weight: 600"
                     >
-                      Hi, ${getUserFirstName(user.fullName)}
+                      Hi, ${getUserFirstName(user.firstName)}
                     </td>
                   </tr>
                   <tr>

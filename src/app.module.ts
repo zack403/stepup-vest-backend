@@ -8,6 +8,7 @@ import * as dbConfig from './database/ormconfig';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { VerificationModule } from './modules/verification/verification.module';
+import { HttpRequestService } from './utils/http-request';
 
 
 @Module({
@@ -20,6 +21,6 @@ import { VerificationModule } from './modules/verification/verification.module';
     HttpModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, HttpRequestService],
 })
 export class AppModule {}

@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { clientFeedback } from './utils/clientReturnfunction';
 
 @Controller()
 export class AppController {
@@ -10,8 +11,14 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // @Get('banks')
-  // getBanks(): string {
-  //   return this.appService.getBanks();
-  // }
+  @Get('banks')
+  async getBanks(): Promise<any> {
+   const res =  await this.appService.getBanks();
+
+   return clientFeedback({
+    status: 200,
+    message: 'Bank fetched successfully',
+    data: res
+   })
+  }
 }

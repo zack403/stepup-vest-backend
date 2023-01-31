@@ -40,7 +40,7 @@ export class EmailService {
       await this.transporter.sendMail({
         from: this.configService.get('EMAIL_FROM'),
         to: user.email,
-        subject: `${user.fullName.split(" ")[0]}, Your Verification Link For StepupVest.`,
+        subject: `${user.firstName}, Your Verification Link For StepupVest.`,
         text: ConfirmEmail(user, link),
         html: ConfirmEmail(user, link),
         headers: { 'x-myheader': 'test header' }

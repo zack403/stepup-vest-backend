@@ -11,7 +11,10 @@ export class UserEntity extends AbstractBaseEntity {
   email: string;
 
   @Column({type: "varchar", length: 128})
-  fullName: string;
+  firstName: string;
+
+  @Column({type: "varchar", length: 128})
+  lastName: string;
 
   @Column({type: "varchar", length: 128})
   phoneNumber: string;
@@ -28,6 +31,9 @@ export class UserEntity extends AbstractBaseEntity {
   
   @Column({type: 'bool', default: false })
   isVerified: boolean;
+
+  @Column({type: 'bool', default: false })
+  bvnVerified: boolean;
 
   toJSON() {
     return classToPlain(this);
