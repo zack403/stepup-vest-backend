@@ -270,7 +270,7 @@ export class AuthService {
 
         if (user.isVerified) {
           return clientFeedback({
-            message: 'Email already verified',
+            message: 'Account  already verified',
             status: 400
           })
         }
