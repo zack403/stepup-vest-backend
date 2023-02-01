@@ -22,8 +22,29 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: "varchar",  length: 128})
   heardAboutUs: string;
 
-  @Column({type: "varchar", nullable: true, length: 128})
+  @Column({type: "varchar", length: 128})
   referralCode: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  referredBy: string;
+  
+  @Column({type: "varchar", nullable: true, length: 128})
+  gender: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  yearOfBirth: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  salaryRange: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  relationShipStatus: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  employmentStatus: string;
+
+  @Column({type: "varchar", nullable: true, length: 128})
+  profilePhoto: string;
   
   @Column()
   @Exclude()
