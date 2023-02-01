@@ -46,6 +46,24 @@ export class AuthService {
 
       request.email = request.email.toLocaleLowerCase();
 
+      const exist = await this.userRepo.findOne({where: {email: request.email}});
+
+      if(exist) {
+        return clientFeedback({
+          status: 200,
+          message: 'Email already exist'
+        })
+      }
+
+      const phoneexist = await this.userRepo.findOne({where: {phoneNumber: request.phoneNumber}});
+
+      if(phoneexist) {
+        return clientFeedback({
+          status: 200,
+          message: 'Phone number already exist'
+        })
+      }
+
       await queryRunner.connect();
       await queryRunner.startTransaction();
       
@@ -57,6 +75,7 @@ export class AuthService {
       const userData = plainToClass(UserEntity, request);
       userData.createdBy = request.email;
       userData.password = hashedPassword;
+      userData.referralCode = `Ref_${generateUniqueCode()}`
 
 
       const saved = await queryRunner.manager.save(UserEntity, userData);

@@ -147,7 +147,7 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
       }
   
       user.updatedAt = new Date();
-      user.updatedBy = user.updatedBy || user.createdBy;
+      user.updatedBy = user.email;
   
     
       const dataToUpdated = plainToClassFromExist(user, payload);
