@@ -19,7 +19,7 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: "varchar", length: 128})
   phoneNumber: string;
 
-  @Column({type: "varchar",  length: 128})
+  @Column({type: "varchar", default: 'others', length: 128})
   heardAboutUs: string;
 
   @Column({type: "varchar", length: 128})
@@ -55,6 +55,18 @@ export class UserEntity extends AbstractBaseEntity {
 
   @Column({type: 'bool', default: false })
   bvnVerified: boolean;
+
+  @Column({type: 'bool', default: false })
+  debitCardAdded: boolean;
+
+  @Column({type: 'bool', default: false })
+  bankDetailsAdded: boolean;
+
+  @Column({type: 'bool', default: false })
+  twoFACompleted: boolean;
+
+  @Column({type: 'bool', default: false })
+  isAdmin: boolean
 
   toJSON() {
     return classToPlain(this);
