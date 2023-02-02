@@ -59,11 +59,11 @@ export class UserController {
   }
 
   
-  @Put(':id')
+  @Put()
   @ApiOperation({ summary: 'Update a user account' })
   @ApiResponse({ status: 200, description: 'Return user successfully updated' })
-  async update(@Res() res: Response, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() req: any) {
-    const result = await this.userService.update(id, updateUserDto, req.user);
+  async update(@Res() res: Response, @Body() updateUserDto: UpdateUserDto, @Req() req: any) {
+    const result = await this.userService.update(updateUserDto, req.user);
     res.status(result.status).json(result);
   }
 
