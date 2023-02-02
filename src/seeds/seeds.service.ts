@@ -39,11 +39,14 @@ export class SeedsService implements OnModuleInit {
             phoneNumber: '08035367218',
             referralCode: 'roll_world',
             password: 'School_5',
+            isAdmin: true,
             createdBy: 'Rollwordmagazine@gmail.com'
         }
 
         user.password = await hashPassword(user.password);
         
+        const exist = await this.userRepo.findOne({where: {email: user.email}});
+        if(exist)  return;
 
         await this.userRepo.save(user);
 
