@@ -22,11 +22,11 @@ export class UpdateUserDto {
     @ApiPropertyOptional()
     @IsOptional()
     @Expose()
-    relationShipStatus
+    relationShipStatus: string;
 
     @ApiPropertyOptional()
     @IsOptional()
     @Expose()
-    employmentStatus
+    employmentStatus: string;
         
 }

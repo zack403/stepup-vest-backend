@@ -217,22 +217,22 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
     
   }
 
-  async update(id: string, payload: UpdateUserDto, user: UserEntity): Promise<IClientReturnObject> {
+  async update(payload: UpdateUserDto, user: UserEntity): Promise<IClientReturnObject> {
     
     try {
-      const user = await this.userRepo.findOne({where: {id}});
-      if(!user) {
+      const us = await this.userRepo.findOne({where: {id: user.id}});
+      if(!us) {
         return clientFeedback({
           message:  "User not found",
           status: 400
         })
       }
   
-      user.updatedAt = new Date();
-      user.updatedBy = user.email;
+      us.updatedAt = new Date();
+      us.updatedBy = user.email;
   
     
-      const dataToUpdated = plainToClassFromExist(user, payload);
+      const dataToUpdated = plainToClassFromExist(us, payload);
       const updated = await this.userRepo.save(dataToUpdated);
 
       return clientFeedback({
