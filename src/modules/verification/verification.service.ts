@@ -7,6 +7,7 @@ import { HttpRequestService } from 'src/utils/http-request';
 import { Repository } from 'typeorm/repository/Repository';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
+import { VerifyAccountDto } from './dto/verify-account.dto';
 
 @Injectable()
 export class VerificationService {
@@ -48,6 +49,40 @@ export class VerificationService {
              return clientFeedback({
               status: 200,
               message: 'BVN look up successful'
+             })
+
+          }
+
+          return result;
+    
+      } catch (error) {
+        this.logger.error(error.message, error);
+        return clientFeedback({
+          message:  `Something failed, ${error.message}`,
+          status: 500,
+          trace: error
+        })
+      }
+      
+
+    }
+
+
+    async verifyAccount(payload: VerifyAccountDto, user: UserEntity): Promise<IClientReturnObject> {
+      try {
+
+          const result = await this.httpReqSvc.resolveAccount(payload);
+          const {data} = result;
+          
+          if(data.account_number) {
+            
+             return clientFeedback({
+                status: 200,
+                message: 'Account resolved successfully',
+                data: {
+                  accountNumber: data.account_number,
+                  accountName: data.account_name,
+                },
              })
 
           }

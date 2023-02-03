@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { VerificationService } from './verification.service';
 import { AddBVNDto } from './dto/add-bvn.dto';
+import { VerifyAccountDto } from './dto/verify-account.dto';
 
 @ApiTags('Verification')
 @ApiBearerAuth()
@@ -23,6 +24,19 @@ export class VerificationController {
       @Req() req: any) : Promise<void> 
   {
     const result = await this.verifySvc.verifyBVN(payload.bvn, req.user);
+    res.status(result.status).json(result);
+  }
+
+  @Post('/resolve-account')
+  @ApiOperation({summary: 'Resolve users account number'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Account Number Successfully resolved' })
+  async verifyAccount(
+      @Res() res: Response, 
+      @Body() payload: VerifyAccountDto,
+      @Req() req: any) : Promise<void> 
+  {
+    const result = await this.verifySvc.verifyAccount(payload, req.user);
     res.status(result.status).json(result);
   }
  
