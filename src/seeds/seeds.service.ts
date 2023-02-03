@@ -33,12 +33,12 @@ export class SeedsService implements OnModuleInit {
     async seedAdminUser () {
 
         const user = {
-            email: 'Rollwordmagazine@gmail.com',
+            email: 'info.rollworldmag@gmail.com',
             firstName: 'Roll',
             lastName: 'World',
             phoneNumber: '08035367218',
             referralCode: 'roll_world',
-            password: 'School_5',
+            password: 'School_5556',
             isAdmin: true,
             createdBy: 'Rollwordmagazine@gmail.com'
         }

@@ -41,8 +41,8 @@ export class VerificationService {
           }
 
           const result = await this.httpReqSvc.matchBVN(payload);
-          
-          if(result.data.account_number && !result.data.is_blacklisted) {
+          const {data} = result;
+          if(data && data.account_number && !data.is_blacklisted) {
             
              await this.userSvc.verifyBVN(user.id);
             
@@ -74,7 +74,7 @@ export class VerificationService {
           const result = await this.httpReqSvc.resolveAccount(payload);
           const {data} = result;
           
-          if(data.account_number) {
+          if(data && data.account_number) {
             
              return clientFeedback({
                 status: 200,
