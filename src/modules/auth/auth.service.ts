@@ -105,6 +105,7 @@ export class AuthService {
       });
 
       delete saved.password;
+      delete saved.isAdmin;
 
 
       const dataToReturn = {
@@ -164,6 +165,7 @@ export class AuthService {
       });
 
       delete user.password;
+      delete user.isAdmin;
 
       const dataToReturn = {
         token,

@@ -200,7 +200,8 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
 
     try {
       const user = await this.userRepo.findOne({where: {id}});
-            
+      delete user.password;
+      delete user.isAdmin;
       
       return clientFeedback({
         message: "Success",
@@ -234,6 +235,9 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
     
       const dataToUpdated = plainToClassFromExist(us, payload);
       const updated = await this.userRepo.save(dataToUpdated);
+
+      delete user.password;
+      delete user.isAdmin;
 
       return clientFeedback({
         message: "Successfully updated",

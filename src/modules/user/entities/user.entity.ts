@@ -1,5 +1,5 @@
 import { Column, Entity } from 'typeorm';
-import { classToPlain, Exclude } from 'class-transformer';
+import { classToPlain, Exclude, instanceToPlain } from 'class-transformer';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
 import { IsEmail } from 'class-validator';
 
@@ -46,8 +46,8 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: "varchar", nullable: true, length: 128})
   profilePhoto: string;
   
+  @Exclude({toPlainOnly: true})
   @Column()
-  @Exclude()
   password: string;
   
   @Column({type: 'bool', default: false })
@@ -68,9 +68,6 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: 'bool', default: false })
   isAdmin: boolean
 
-  toJSON() {
-    return classToPlain(this);
-  }
 
 }
 
