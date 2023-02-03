@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import * as dbConfig from './database/ormconfig';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { TransactionModule } from './modules/transactions/transaction.module';
 import { UserModule } from './modules/user/user.module';
 import { VerificationModule } from './modules/verification/verification.module';
 import { SeedsModule } from './seeds/seeds.module';
@@ -22,6 +23,7 @@ import { HttpRequestService } from './utils/http-request';
     VerificationModule,
     HttpModule,
     AdminModule,
+    TransactionModule,
     SeedsModule
   ],
   controllers: [AppController],
