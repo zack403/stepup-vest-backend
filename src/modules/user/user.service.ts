@@ -231,7 +231,7 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
       const user = await this.userRepo.findOne({where: {email}});
       
       if(user) {
-        delete user.password;
+        //delete user.password;
         delete user.isAdmin;
       }
       
