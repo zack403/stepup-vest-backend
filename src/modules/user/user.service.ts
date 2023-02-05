@@ -204,8 +204,11 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
 
     try {
       const user = await this.userRepo.findOne({where: {id}});
-      delete user.password;
-      delete user.isAdmin;
+
+      if(user) {
+        delete user.password;
+        delete user.isAdmin;
+      }
       
       return clientFeedback({
         message: "Success",
@@ -226,8 +229,11 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
   async findByEmail(email: string):Promise<UserEntity> {
   
       const user = await this.userRepo.findOne({where: {email}});
-      delete user.password;
-      delete user.isAdmin;
+      
+      if(user) {
+        delete user.password;
+        delete user.isAdmin;
+      }
       
       return user;  
   }
@@ -235,8 +241,11 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
   async findByPhoneNumber(phoneNumber: string):Promise<UserEntity> {
   
     const user = await this.userRepo.findOne({where: {phoneNumber}});
-    delete user.password;
-    delete user.isAdmin;
+    
+    if(user) {
+      delete user.password;
+      delete user.isAdmin;
+    }
     
     return user;  
 }
@@ -244,8 +253,11 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
 async findByUserId(id: string):Promise<UserEntity> {
   
   const user = await this.userRepo.findOne({where: {id}});
-  delete user.password;
-  delete user.isAdmin;
+  
+  if(user) {
+    delete user.password;
+    delete user.isAdmin;
+  }
   
   return user;  
 }

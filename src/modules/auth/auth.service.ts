@@ -124,7 +124,8 @@ export class AuthService {
 
       return ({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Error while creating user - Error: ${error.message}`
+        message: `Error while creating user - Error: ${error.message}`,
+        trace: error
       });
 
     } finally {
