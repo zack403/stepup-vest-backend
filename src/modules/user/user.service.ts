@@ -4,10 +4,13 @@ import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { JwtPayload } from 'src/types/jwtPayload';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
+import { DataSource, QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { AddBankDetailsDto } from './dto/add-bank-details.dto';
+import { AddCardDto } from './dto/add-card.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BankDetailsEntity } from './entities/bank-details.entity';
+import { CardEntity } from './entities/card.entity';
 import { UserEntity } from './entities/user.entity';
 
 @Injectable()
@@ -17,6 +20,7 @@ export class UserService {
 
   constructor(
     @InjectRepository(BankDetailsEntity) private bdRepo: Repository<BankDetailsEntity>,
+    @InjectRepository(CardEntity) private cardRepo: Repository<CardEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {}
 
   async addBankDetails(req: AddBankDetailsDto, user: UserEntity): Promise<IClientReturnObject> {
@@ -218,6 +222,42 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
     
   }
 
+  
+  async findByEmail(email: string):Promise<UserEntity> {
+  
+      const user = await this.userRepo.findOne({where: {email}});
+      delete user.password;
+      delete user.isAdmin;
+      
+      return user;  
+  }
+
+  async findByPhoneNumber(phoneNumber: string):Promise<UserEntity> {
+  
+    const user = await this.userRepo.findOne({where: {phoneNumber}});
+    delete user.password;
+    delete user.isAdmin;
+    
+    return user;  
+}
+
+async findByUserId(id: string):Promise<UserEntity> {
+  
+  const user = await this.userRepo.findOne({where: {id}});
+  delete user.password;
+  delete user.isAdmin;
+  
+  return user;  
+}
+
+  async saveAdminUser(user: any): Promise<UserEntity> {
+    return await this.userRepo.save(user);
+  }
+
+  async saveOrUpdateUser(user: UserEntity): Promise<UserEntity> {
+    return await this.userRepo.save(user);
+  }
+
   async update(payload: UpdateUserDto, user: UserEntity): Promise<IClientReturnObject> {
     
     try {
@@ -256,6 +296,16 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
     
   }
 
+  async getCards(user: UserEntity): Promise<IClientReturnObject> {
+    const cards =  await this.cardRepo.find({where: {userId: user.id}});
+
+    return clientFeedback({
+      status: 200,
+      message: 'Cards fetched successfully',
+      data: cards
+    })
+  }
+
   async verifyBVN(userId): Promise<void> {
     await this.userRepo.update({id: userId}, {bvnVerified: true});
   }
@@ -263,5 +313,24 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
   async validateUser(payload: JwtPayload): Promise<UserEntity> {
     
     return await this.userRepo.findOne({where: {email: payload.email}});
+  }
+
+  async cardExist(userId, cardSignature): Promise<CardEntity> {
+    return await this.cardRepo.findOne({where: {userId, signature: cardSignature}});
+  }
+
+  async addCard(payload: AddCardDto, queryRunner: QueryRunner): Promise<any> {
+    const data = plainToClass(CardEntity, payload);
+
+    await queryRunner.manager.save(CardEntity, data);
+    
+    await queryRunner.manager.update(UserEntity,
+      {
+        id: payload.userId
+      },
+      {
+        debitCardAdded: true
+      }
+    );
   }
 }
