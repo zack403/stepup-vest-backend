@@ -39,6 +39,7 @@ export class AppService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
+      console.log(`req body`, req.body);
 
       //const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
       //if (hash == req.headers['x-paystack-signature']) {
@@ -55,9 +56,8 @@ export class AppService {
             const amount = result.amount / 100;
             
             if(transaction) {
-                const res = await this.userSvc.findOne(transaction.userId);
-                const user = res.data;
-
+                const user = await this.userSvc.findByUserId(transaction.userId);
+                
               switch (transaction.mode) {
                 case ModeType.ADD_CARD:
 

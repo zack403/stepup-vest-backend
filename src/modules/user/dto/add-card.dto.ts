@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { 
+    IsBoolean,
     IsNotEmpty, 
     IsString 
 } from "class-validator";
@@ -74,8 +75,8 @@ export class AddCardDto {
 
     @IsString()
     @ApiProperty()
-    @IsNotEmpty()
-    reusable: string;
+    @IsBoolean()
+    reusable: boolean;
 
     @IsString()
     @ApiProperty()
