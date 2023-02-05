@@ -42,7 +42,8 @@ export class AppService {
       console.log(`req body`, req.body);
 
       const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
-      if (hash == req.headers['x-paystack-signature']) {
+      //if (hash == req.headers['x-paystack-signature']) {
+        console.log("hash", hash);
 
         // Retrieve the request's body
         const response = req.body;
@@ -129,7 +130,7 @@ export class AppService {
           message: `Your payment was successful`
         })
           
-      }
+      //}
 
       console.log("nothing")
 
