@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PassportModule } from '@nestjs/passport';
 import { AdminSettingEntity } from './setting.entity';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       AdminSettingEntity
     ]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    AuthModule
   ],
   controllers: [AdminController],
-  providers: [AdminService]
+  providers: [AdminService],
+  exports: [TypeOrmModule]
 })
 export class AdminModule {}

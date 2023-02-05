@@ -2,8 +2,8 @@ import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AdminService } from "src/modules/admin/admin.service";
 import { UserEntity } from "src/modules/user/entities/user.entity";
+import { UserService } from "src/modules/user/user.service";
 import { hashPassword } from "src/utils/hasher";
-import { Repository } from "typeorm";
 
 
 
@@ -15,7 +15,7 @@ export class SeedsService implements OnModuleInit {
 
     constructor(
         private adminSvc: AdminService, 
-        @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
+        private userSvc: UserService,
         ) {}
 
 
@@ -45,10 +45,10 @@ export class SeedsService implements OnModuleInit {
 
         user.password = await hashPassword(user.password);
         
-        const exist = await this.userRepo.findOne({where: {email: user.email}});
+        const exist = await this.userSvc.findByEmail(user.email);
         if(exist)  return;
 
-        await this.userRepo.save(user);
+        await this.userSvc.saveAdminUser(user);
 
     }
 

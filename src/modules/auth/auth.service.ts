@@ -18,8 +18,8 @@ import { PasswordResetEntity } from './entities/password-reset.entity';
 import { EmailService } from '../../services/email/email.service';
 import { IClientReturnObject } from '../../types/clientReturnObj';
 import { clientFeedback } from '../../utils/clientReturnfunction';
-import { UserService } from '../user/user.service';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
+import { UserService } from '../user/user.service';
 
 
 
@@ -32,11 +32,9 @@ export class AuthService {
     private emailService: EmailService,
     private dataSource: DataSource,
     @InjectRepository(EmailVerificationEntity) private emailVerificationRepo: Repository<EmailVerificationEntity>,
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
-    @InjectRepository(EmailVerificationEntity) private emailVerifRepo: Repository<EmailVerificationEntity>,
+    private readonly userSvc: UserService,
     @InjectRepository(PasswordResetEntity) private passwordResetRepo: Repository<PasswordResetEntity>,
-    private readonly configService: ConfigService,
-    private userSvc: UserService) { }
+    private readonly configService: ConfigService) { }
 
 
   async register(request: RegisterDto): Promise<IClientReturnObject> {
@@ -46,7 +44,7 @@ export class AuthService {
 
       request.email = request.email.toLocaleLowerCase();
 
-      const exist = await this.userRepo.findOne({where: {email: request.email}});
+      const exist = await this.userSvc.findByEmail(request.email);
 
       if(exist) {
         return clientFeedback({
@@ -55,7 +53,7 @@ export class AuthService {
         })
       }
 
-      const phoneexist = await this.userRepo.findOne({where: {phoneNumber: request.phoneNumber}});
+      const phoneexist = await this.userSvc.findByPhoneNumber(request.phoneNumber);
 
       if(phoneexist) {
         return clientFeedback({
@@ -138,7 +136,7 @@ export class AuthService {
 
     try {
 
-      const user = await this.userRepo.findOne({ where: { email: request.email.toLocaleLowerCase() }});
+      const user = await this.userSvc.findByEmail( request.email.toLocaleLowerCase());
       if (!user) {
         return clientFeedback({
           message: 'Login Failed, invalid email or password.',
@@ -193,7 +191,7 @@ export class AuthService {
   async createEmailToken(email: string): Promise<IClientReturnObject> {
     try {
 
-      const user = await this.userRepo.findOne({ where: { email } })
+      const user = await this.userSvc.findByEmail(email);
 
       if (!user) {
         return clientFeedback({
@@ -241,7 +239,7 @@ export class AuthService {
 
   public async sendVerificationEmail(email: string, token: string): Promise<boolean> {
     const frontednUrl = this.configService.get("FRONTED_URL");
-    const user = await this.userRepo.findOne({ where: { email } });
+    const user = await this.userSvc.findByEmail(email);
 
     if (user) {
 
@@ -257,12 +255,12 @@ export class AuthService {
 
   public async verifyEmail(token: string): Promise<IClientReturnObject> {
 
-    const result = await this.emailVerifRepo.findOne({ where: { emailToken: token } });
+    const result = await this.emailVerificationRepo.findOne({ where: { emailToken: token } });
     if (result && result.userId) {
 
       try {
 
-        const user = await this.userRepo.findOne({ where: { id: result.userId }});
+        const user = await this.userSvc.findByUserId(result.userId);
         if (!user) {
           return clientFeedback({
             message: 'User does not exist',
@@ -282,7 +280,7 @@ export class AuthService {
         user.updatedBy = user.email;
 
         await user.save();
-        await this.emailVerifRepo.delete({ id: result.id });
+        await this.emailVerificationRepo.delete({ id: result.id });
 
         //generate auth token
         const { id, email, firstName, lastName} = user;
@@ -341,7 +339,7 @@ export class AuthService {
   public async sendEmailForgotPassword(email: string): Promise<IClientReturnObject> {
     try {
       const frontendUrl = this.configService.get("FRONTEND_URL");
-      const user = await this.userRepo.findOne({ where: { email: email } });
+      const user = await this.userSvc.findByEmail(email);
       if (!user) {
         return clientFeedback({
           message: `An account with the email ${email} does not exist with us`,
@@ -412,7 +410,7 @@ export class AuthService {
       });
     }
 
-    const user = await this.userRepo.findOne({ where: { id: userToken.userId } });
+    const user = await this.userSvc.findByUserId(userToken.userId);
     if (!user) {
       return clientFeedback({
         status: HttpStatus.BAD_REQUEST,
@@ -433,7 +431,7 @@ export class AuthService {
     user.password = hashedPassword;
 
     try {
-      const updated = await this.userRepo.save(user);
+      const updated = await this.userSvc.saveOrUpdateUser(user);
       if (updated) {
         return {
           status: HttpStatus.OK,
@@ -472,7 +470,7 @@ export class AuthService {
 
         user.password = hashedPassword;
 
-        const updated = await this.userRepo.save(user);
+        const updated = await this.userSvc.saveOrUpdateUser(user);
         if (updated) {
           
           return ({

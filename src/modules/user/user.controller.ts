@@ -49,6 +49,13 @@ export class UserController {
     res.status(result.status).json(result);
   }
 
+  @Get('cards')
+  @ApiOperation({ summary: 'Get all my cards'})
+  @ApiResponse({ status: 200, description: 'Return all my cards'})
+  async getCards(@Res() res: Response,  @Req() req: any): Promise<void> {
+    const result = await this.userService.getCards(req.user);
+    res.status(result.status).json(result);
+  }
   
   @Get(':id')
   @ApiOperation({ summary: 'Get a user account' })
@@ -67,6 +74,5 @@ export class UserController {
     res.status(result.status).json(result);
   }
 
-
- 
+  
 }
