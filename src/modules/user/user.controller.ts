@@ -1,4 +1,4 @@
-import { Controller, Get, Body, Param, Req, Res, Put, UseGuards, Post} from '@nestjs/common';
+import { Controller, Get, Body, Param, Req, Res, Put, UseGuards, Post, Delete} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -54,6 +54,14 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Return all my cards'})
   async getCards(@Res() res: Response,  @Req() req: any): Promise<void> {
     const result = await this.userService.getCards(req.user);
+    res.status(result.status).json(result);
+  }
+
+  @Delete('card/:cardId')
+  @ApiOperation({ summary: 'remove a card'})
+  @ApiResponse({ status: 200, description: 'Remove card'})
+  async removeCard(@Res() res: Response, @Param('cardId') cardId: string, @Req() req: any): Promise<void> {
+    const result = await this.userService.removeCard(cardId, req.user);
     res.status(result.status).json(result);
   }
   

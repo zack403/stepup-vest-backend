@@ -345,4 +345,35 @@ async findByUserId(id: string):Promise<UserEntity> {
       }
     );
   }
+
+  async removeCard(cardId, user: UserEntity): Promise<IClientReturnObject> {
+    
+    try {
+
+        const cards = await this.cardRepo.find({where: {userId: user.id}});
+        if(cards.length <= 1) {
+          return clientFeedback({
+            status: 200,
+            message: `You need to have atleast one card`
+          })
+        }
+
+        //check if card in use
+
+        await this.cardRepo.delete({id: cardId});
+
+        return clientFeedback({
+          status: 200,
+          message: 'Card removed successfully'
+        })
+
+      
+    } catch (error) {
+      return clientFeedback({
+        status: 500,
+        message: 'something failed'
+      })
+    }
+        
+  }
 }
