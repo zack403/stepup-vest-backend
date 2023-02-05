@@ -39,7 +39,7 @@ export class AppService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      this.logger.log(`req body - ${req.body}`);
+      console.log(`req body`, req.body);
 
       const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
       if (hash == req.headers['x-paystack-signature']) {
