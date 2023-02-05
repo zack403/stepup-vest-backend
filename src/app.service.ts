@@ -132,6 +132,9 @@ export class AppService {
       //}
 
     } catch (error) {
+
+      this.logger.log(`Error in completing event hooks - ${error.message}`)
+      
       
       await queryRunner.rollbackTransaction();
       return clientFeedback({
