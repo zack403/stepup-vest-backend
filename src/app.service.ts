@@ -39,15 +39,14 @@ export class AppService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      console.log(`req body`, req.body);
 
-      const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
+      //const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
       //if (hash == req.headers['x-paystack-signature']) {
-        console.log("hash", hash);
+        //console.log("hash", hash);
 
         // Retrieve the request's body
         const response = req.body;
-      console.log("response", response)
+        console.log("response", response)
 
         if (response.event === 'charge.success') {
             const result = response.data;
@@ -131,13 +130,6 @@ export class AppService {
         })
           
       //}
-
-      console.log("nothing")
-
-      return clientFeedback({
-        status: 200,
-        message: `Your payment was successful`
-      })
 
     } catch (error) {
       
