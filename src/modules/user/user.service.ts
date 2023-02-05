@@ -236,8 +236,8 @@ async getOneUserBankDetails(userId): Promise<BankDetailsEntity> {
       const dataToUpdated = plainToClassFromExist(us, payload);
       const updated = await this.userRepo.save(dataToUpdated);
 
-      delete user.password;
-      delete user.isAdmin;
+      delete updated.password;
+      delete updated.isAdmin;
 
       return clientFeedback({
         message: "Successfully updated",

@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { clientFeedback } from './utils/clientReturnfunction';
+import {Response} from 'express';
 
 @Controller()
 export class AppController {
@@ -13,12 +14,18 @@ export class AppController {
 
   @Get('banks')
   async getBanks(): Promise<any> {
-   const res =  await this.appService.getBanks();
+    const res =  await this.appService.getBanks();
 
-   return clientFeedback({
-    status: 200,
-    message: 'Bank fetched successfully',
-    data: res
-   })
+    return clientFeedback({
+      status: 200,
+      message: 'Bank fetched successfully',
+      data: res
+    })
+  }
+
+  @Post('on_paystack_events')
+  async onPaystackEvents(@Res() res: Response, @Req() req: any) {
+    const result = await this.appService.onPaystackEvents(req);
+    res.send(result.status);
   }
 }

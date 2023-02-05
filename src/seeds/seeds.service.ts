@@ -59,6 +59,8 @@ export class SeedsService implements OnModuleInit {
             createdBy: 'admin'
         }
 
+        if(await this.adminSvc.checkSetting()) return;
+        
         await this.adminSvc.seedSetting(payload);
 
     }

@@ -47,5 +47,11 @@ export class AdminService {
             await this.admSetRepo.save(payload);
         }
 
+        async checkSetting(): Promise<boolean> {
+            const setting = await this.admSetRepo.find();
+            if(setting.length > 0) return true;
+            return false;
+        }
+
   }
 
