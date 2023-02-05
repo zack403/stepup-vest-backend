@@ -42,7 +42,7 @@ export class CardEntity extends AbstractBaseEntity {
   @Column({type: "varchar", length: 128})
   countryCode: string;
 
-  @Column({type: "varchar", length: 128})
+  @Column({type: "varchar", nullable: true, length: 128})
   accountName: string;
   
   @Column({type: 'bool', default: false })

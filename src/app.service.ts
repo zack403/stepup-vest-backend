@@ -39,19 +39,16 @@ export class AppService {
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      console.log(`req body`, req.body);
-
       //const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
       //if (hash == req.headers['x-paystack-signature']) {
         //console.log("hash", hash);
 
         // Retrieve the request's body
         const response = req.body;
-        console.log("response", response)
 
         if (response.event === 'charge.success') {
             const result = response.data;
-            console.log("result", result)
+            
             const transaction = await this.transSvc.findTransactionByReference(result.reference);
             const amount = result.amount / 100;
             
@@ -133,7 +130,7 @@ export class AppService {
 
     } catch (error) {
 
-      this.logger.log(`Error in completing event hooks - ${error.message}`)
+      this.logger.error(`Error in completing event hooks - ${error.message}`)
       
       
       await queryRunner.rollbackTransaction();
