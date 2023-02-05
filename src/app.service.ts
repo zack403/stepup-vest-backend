@@ -46,8 +46,11 @@ export class AppService {
 
         // Retrieve the request's body
         const response = req.body;
+      console.log("response", response)
+
         if (response.event === 'charge.success') {
             const result = response.data;
+            console.log("result", result)
             const transaction = await this.transSvc.findTransactionByReference(result.reference);
             const amount = result.amount / 100;
             
@@ -127,6 +130,13 @@ export class AppService {
         })
           
       }
+
+      console.log("nothing")
+
+      return clientFeedback({
+        status: 200,
+        message: `Your payment was successful`
+      })
 
     } catch (error) {
       
