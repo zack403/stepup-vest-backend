@@ -74,12 +74,25 @@ export class AdminService {
                     message: 'Access denied!, contact administrator'
                 })
             }
+            const sts = await this.stRepo.find();
+            return clientFeedback ({
+                status: 200,
+                message: 'Savings type fetched successfully',
+                data: sts
+            })
+        }
+
+        async getSavingsType(): Promise<IClientReturnObject> {
             const sts = await this.stRepo.find({where: {disabled: false}});
             return clientFeedback ({
                 status: 200,
                 message: 'Savings type fetched successfully',
                 data: sts
             })
+        }
+
+        async getSavingsTypeById(id): Promise<SavingsTypeEntity> {
+            return await this.stRepo.findOne({where: {id}});
         }
 
         async getStepUpSavingsType(): Promise<SavingsTypeEntity> {

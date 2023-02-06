@@ -30,6 +30,9 @@ export class TransactionEntity extends AbstractBaseEntity {
     @Column({type: "enum", enum: ModeType})
     mode: ModeType;
 
+    @Column({type: 'uuid', nullable: true})
+    savingTypeId: string;
+
     @AfterLoad()
     toNumber() {
         this.amount = parseFloat(this.amount as any);

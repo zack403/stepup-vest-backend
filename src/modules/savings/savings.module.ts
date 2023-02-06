@@ -7,6 +7,8 @@ import { SavingsController } from './savings.controller';
 import { SavingsService } from './savings.service';
 import { AdminService } from '../admin/admin.service';
 import { AdminModule } from '../admin/admin.module';
+import { TransactionService } from '../transactions/transaction.service';
+import { TransactionModule } from '../transactions/transaction.module';
 
 @Module({
   imports: [
@@ -15,10 +17,11 @@ import { AdminModule } from '../admin/admin.module';
     ]),
     HttpModule,
     AuthModule,
-    AdminModule
+    AdminModule,
+    TransactionModule
   ],
   controllers: [SavingsController],
-  providers: [SavingsService, AdminService],
+  providers: [SavingsService, AdminService, TransactionService],
   exports: [TypeOrmModule, SavingsService]
 })
 export class SavingsModule {}
