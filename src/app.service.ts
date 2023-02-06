@@ -158,5 +158,10 @@ export class AppService {
         })
 
     }
+
+    return clientFeedback({
+      status: 200,
+      message: `Your payment was successful`
+    })
   }
 }
