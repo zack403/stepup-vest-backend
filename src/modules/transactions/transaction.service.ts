@@ -52,6 +52,10 @@ export class TransactionService {
         }
     }
 
+    async saveTrans(data): Promise<TransactionEntity> {
+        return await this.transRepo.save(data);
+    }
+
     async findTransactionByReference(reference): Promise<TransactionEntity> {
         return await this.transRepo.findOne({where: {reference: reference}});
     }
