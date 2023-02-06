@@ -122,24 +122,22 @@ export class AppService {
               await this.userSvc.addCard(request, queryRunner);
 
               this.logger.log("card added")
-
-
-              //update transactions table
-              const data = {
-                amount,
-                status: TransactionStatus.COMPLETED,
-                transactionDate: new Date()
-              }
-
-              await this.transSvc.updateTransactionByReference(transaction.reference, data, queryRunner);
-
-              this.logger.log("transaction updated");
-
-              await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner);
-
-              this.logger.log("savings updated updated");
-
             }
+
+            //update transactions table
+            const data = {
+              amount,
+              status: TransactionStatus.COMPLETED,
+              transactionDate: new Date()
+            }
+
+            await this.transSvc.updateTransactionByReference(transaction.reference, data, queryRunner);
+
+            this.logger.log("transaction updated");
+
+            await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner);
+
+            this.logger.log("savings updated updated");
             
             break;
         
