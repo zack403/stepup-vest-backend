@@ -80,4 +80,26 @@ export class HttpRequestService {
         }
     }
 
+    async verifyPayment(ref): Promise<any> {
+        try {
+          const result = await lastValueFrom(this.httpService.get(
+              `${this.configSvc.get("PAYSTACK_BASE_URL")}transaction/verify/${ref}`,
+              this.payStackRequestHeaders
+            ).pipe(map(r => r.data)));
+
+            if(result.status) {
+          
+              return result;  
+            }
+          
+          } catch (error) {
+              
+              return clientFeedback({
+                  message:  `Something failed, ${error.response.data.message}`,
+                  status: 500,
+                  trace: error
+              })
+          }
+    }
+
 }

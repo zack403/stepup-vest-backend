@@ -310,11 +310,29 @@ async findByUserId(id: string):Promise<UserEntity> {
 
   async getCards(user: UserEntity): Promise<IClientReturnObject> {
     const cards =  await this.cardRepo.find({where: {userId: user.id}});
+    let results = [];
+    
+    for (const c of cards) {
+
+      const dataToReturn = {
+        id: c.id,
+        accountName: c.accountName, 
+        bank: c.bank, 
+        cardType: c.cardType, 
+        expMonth: c.expMonth, 
+        expYear: c.expYear,
+        last4: c.last4
+      }
+
+      results.push(dataToReturn);
+
+    }
+   
 
     return clientFeedback({
       status: 200,
       message: 'Cards fetched successfully',
-      data: cards
+      data: results
     })
   }
 

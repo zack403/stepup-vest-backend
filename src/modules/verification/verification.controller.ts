@@ -1,10 +1,11 @@
 import { Controller, Get, Body, Param, Req, Res, Put, UseGuards, Post} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { VerificationService } from './verification.service';
 import { AddBVNDto } from './dto/add-bvn.dto';
 import { VerifyAccountDto } from './dto/verify-account.dto';
+import { ModeType } from 'src/utils/enum';
 
 @ApiTags('Verification')
 @ApiBearerAuth()
@@ -38,6 +39,17 @@ export class VerificationController {
   {
     const result = await this.verifySvc.verifyAccount(payload, req.user);
     res.status(result.status).json(result);
+  }
+
+  @Get('payment/:reference_code')
+  @ApiParam({ name: 'reference_code', type: String})
+  @ApiOkResponse({ description: 'The payment was successfully' })
+  @ApiBadRequestResponse({ description: 'The pay failed' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error, check the response body' })
+  async verifypayment(@Res() res: Response, @Req() req: any, @Param() param: any) {
+    
+      const result = await this.verifySvc.verifyPayment(param['reference_code'], req.user);
+      res.status(result.status).json(result)
   }
  
 }

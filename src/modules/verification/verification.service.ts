@@ -1,10 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { AppService } from 'src/app.service';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
+import { ModeType, TransactionStatus } from 'src/utils/enum';
 import { HttpRequestService } from 'src/utils/http-request';
-import { Repository } from 'typeorm/repository/Repository';
+import { DataSource } from 'typeorm';
+import { AddCardDto } from '../user/dto/add-card.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { VerifyAccountDto } from './dto/verify-account.dto';
@@ -14,7 +17,10 @@ export class VerificationService {
 
   logger = new Logger('VerificationService');
 
-  constructor(private userSvc: UserService, private httpReqSvc: HttpRequestService) {}
+  constructor(private userSvc: UserService,
+    private dataSource: DataSource,
+    private appSvc: AppService, 
+    private httpReqSvc: HttpRequestService) {}
 
   async verifyBVN(bvn, user: UserEntity): Promise<IClientReturnObject> {
       try {
@@ -97,8 +103,48 @@ export class VerificationService {
           trace: error
         })
       }
-      
-
     }
+
+    async verifyPayment(referenceCode: string, user: UserEntity): Promise<IClientReturnObject> {
+
+      const queryRunner = this.dataSource.createQueryRunner();
+  
+      try {
+  
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+  
+
+        const result = await this.httpReqSvc.verifyPayment(referenceCode);
+
+        const {data}  = result;
+  
+        if (data.status === "failed") {
+          return clientFeedback({
+            status: 400,
+            message: 'Payment failed'
+          })
+        }
+  
+        if (data.status === "success") {
+
+          return await this.appSvc.reconcileAndSettlePayment(data, queryRunner);
+  
+        }
+  
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+
+        return clientFeedback({
+          status: 500,
+          message: error.message,
+          trace: error,
+        })
+
+      } finally {
+        await queryRunner.release();
+      }
+    }
+
   }
 
