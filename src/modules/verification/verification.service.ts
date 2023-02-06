@@ -118,19 +118,24 @@ export class VerificationService {
         const result = await this.httpReqSvc.verifyPayment(referenceCode);
 
         const {data}  = result;
-  
-        if (data.status === "failed") {
-          return clientFeedback({
-            status: 400,
-            message: 'Payment failed'
-          })
-        }
-  
-        if (data.status === "success") {
 
-          return await this.appSvc.reconcileAndSettlePayment(data, queryRunner);
+        if(data) {
+          
+          if (data.status === "failed") {
+            return clientFeedback({
+              status: 400,
+              message: 'Payment failed'
+            })
+          }
+    
+          if (data.status === "success") {
   
+            return await this.appSvc.reconcileAndSettlePayment(data, queryRunner);
+    
+          }
         }
+  
+        return result;
   
       } catch (error) {
         await queryRunner.rollbackTransaction();
