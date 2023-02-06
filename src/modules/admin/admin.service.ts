@@ -6,14 +6,18 @@ import { clientFeedback } from 'src/utils/clientReturnfunction';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user/entities/user.entity';
 import { AdminSettingsDto } from './dto/setting.dto';
-import { AdminSettingEntity } from './setting.entity';
+import { SavingsTypeEntity } from './entities/savings-type.entity';
+import { AdminSettingEntity } from './entities/setting.entity';
 
 @Injectable()
 export class AdminService {
 
   logger = new Logger('AdminService');
 
-  constructor(@InjectRepository(AdminSettingEntity) private admSetRepo: Repository<AdminSettingEntity>) {}
+  constructor(
+    @InjectRepository(SavingsTypeEntity) private stRepo: Repository<SavingsTypeEntity>,
+    @InjectRepository(AdminSettingEntity) private admSetRepo: Repository<AdminSettingEntity>
+    ) {}
 
         async updateSettings(req: AdminSettingsDto, user: UserEntity): Promise<IClientReturnObject> {
             
@@ -22,7 +26,7 @@ export class AdminService {
                 if(!user.isAdmin) {
                     return clientFeedback({
                         status: 403,
-                        message: 'Access denied, only an admin user can do this'
+                        message: 'Access denied!, contact administrator'
                     })
                 }
     
@@ -51,6 +55,35 @@ export class AdminService {
             const setting = await this.admSetRepo.find();
             if(setting.length > 0) return true;
             return false;
+        }
+
+        async seedSavingsType (payload: any) {
+            await this.stRepo.save(payload);
+        }
+
+        async checkSavingsType(): Promise<boolean> {
+            const st = await this.stRepo.find();
+            if(st.length > 0) return true;
+            return false;
+        }
+
+        async getSvaingsType(user: UserEntity): Promise<IClientReturnObject> {
+            if(!user.isAdmin) {
+                return clientFeedback({
+                    status: 403,
+                    message: 'Access denied!, contact administrator'
+                })
+            }
+            const sts = await this.stRepo.find({where: {disabled: false}});
+            return clientFeedback ({
+                status: 200,
+                message: 'Savings type fetched successfully',
+                data: sts
+            })
+        }
+
+        async getStepUpSavingsType(): Promise<SavingsTypeEntity> {
+             return await this.stRepo.findOne({where: {name: 'Stepupbank'}});
         }
 
   }

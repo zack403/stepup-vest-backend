@@ -24,6 +24,7 @@ export class SeedsService implements OnModuleInit {
 
             await this.seedAdminUser();
             await this.saveAdminSetting();
+            await this.saveSavingsType();
 
         } catch (error) {
             this.logger.error(error);
@@ -62,6 +63,52 @@ export class SeedsService implements OnModuleInit {
         if(await this.adminSvc.checkSetting()) return;
         
         await this.adminSvc.seedSetting(payload);
+
+    }
+
+    async saveSavingsType () {
+        const payload = [
+            {
+                name: 'Stepupbank',
+                currency: 'NGN',
+                disabled: false,
+                createdBy: 'admin'
+            },
+            {
+                name: 'Flex Naira',
+                currency: 'NGN',
+                disabled: true,
+                createdBy: 'admin'
+            },
+            {
+                name: 'Safelock',
+                currency: 'NGN',
+                disabled: true,
+                createdBy: 'admin'
+            },
+            {
+                name: 'Targets',
+                currency: 'NGN',
+                disabled: true,
+                createdBy: 'admin'
+            },
+            {
+                name: 'Flex Dollar',
+                currency: 'NGN',
+                disabled: true,
+                createdBy: 'admin'
+            },
+            {
+                name: 'PocketApp',
+                currency: 'NGN',
+                disabled: true,
+                createdBy: 'admin'
+            }
+        ]
+
+        if(await this.adminSvc.checkSavingsType()) return;
+        
+        await this.adminSvc.seedSavingsType(payload);
 
     }
 

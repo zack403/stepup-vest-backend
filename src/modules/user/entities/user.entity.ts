@@ -1,4 +1,4 @@
-import { Column, Entity } from 'typeorm';
+import { AfterLoad, Column, Entity } from 'typeorm';
 import { classToPlain, Exclude, instanceToPlain } from 'class-transformer';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
 import { IsEmail } from 'class-validator';
@@ -66,7 +66,15 @@ export class UserEntity extends AbstractBaseEntity {
   twoFACompleted: boolean;
 
   @Column({type: 'bool', default: false })
-  isAdmin: boolean
+  isAdmin: boolean;
+
+  @Column({type: "numeric", default: 0, precision: 10, scale: 2})
+  referralBalance: number;
+
+  @AfterLoad()
+  toNumber() {
+      this.referralBalance = parseFloat(this.referralBalance as any);
+  }
 
 
 }
