@@ -41,8 +41,8 @@ export class AppService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        //const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
-        //if (hash == req.headers['x-paystack-signature']) {
+        const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
+        if (hash == req.headers['x-paystack-signature']) {
       
         const response = req.body;
 
@@ -54,10 +54,10 @@ export class AppService {
 
         return clientFeedback({
           status: 200,
-          message: `Your payment was successful`
+          message: `Event acknowledged`
         })
           
-      //}
+      }
 
     } catch (error) {
 
@@ -87,7 +87,7 @@ export class AppService {
         if(transaction.status === TransactionStatus.COMPLETED) {
           return clientFeedback ({ 
             status: 200,
-            message: 'Payment successful'
+            message: 'Transaction completed already.'
           })
         }
         const user = await this.userSvc.findByUserId(transaction.userId);
@@ -161,7 +161,7 @@ export class AppService {
 
     return clientFeedback({
       status: 200,
-      message: `Your payment was successful`
+      message: `No transaction found`
     })
   }
 }
