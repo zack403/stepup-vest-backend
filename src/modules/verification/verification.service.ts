@@ -140,6 +140,8 @@ export class VerificationService {
       } catch (error) {
         await queryRunner.rollbackTransaction();
 
+        this.logger.error(`error in verifying payment - ${error.message} - ${error}`)
+
         return clientFeedback({
           status: 500,
           message: error.message,

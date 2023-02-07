@@ -46,6 +46,8 @@ export class AppService {
       
         const response = req.body;
 
+        this.logger.log("in paystack hook")
+
         if (response.event === 'charge.success') {
             const result = response.data;
 
