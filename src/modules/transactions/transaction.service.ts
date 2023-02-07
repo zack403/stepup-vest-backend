@@ -67,6 +67,23 @@ export class TransactionService {
             })
     }
 
+    async writeSavingsCharge(transaction: TransactionEntity, email: string, amount: number, queryRunner: QueryRunner): Promise<any> {
+        
+        const data = {
+            userId: transaction.userId,
+            amount,
+            reference: transaction.reference,
+            transactionDate: new Date(),
+            transactionType: TransactionType.CREDIT,
+            status: TransactionStatus.COMPLETED,    
+            description: `${transaction.reference} - 1% charge on your ${amount} saving`,
+            mode: ModeType.MANUAL,
+            createdBy: email
+        }
+
+         await queryRunner.manager.save(TransactionEntity, data);
+    }
+
     async getTransactions(query: TransactionQuery, user: UserEntity): Promise<IClientReturnObject> {
 
         try {
