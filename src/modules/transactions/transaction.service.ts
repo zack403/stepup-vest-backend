@@ -79,7 +79,7 @@ export class TransactionService {
             amount: finalAmount,
             reference: transaction.reference,
             transactionDate: new Date(),
-            transactionType: TransactionType.CREDIT,
+            transactionType: TransactionType.DEBIT,
             status: TransactionStatus.COMPLETED,    
             description: `${transaction.reference} - ${setting.chargesOnSavings}% charge on your ${amount} quick save deposit`,
             mode: ModeType.MANUAL,
