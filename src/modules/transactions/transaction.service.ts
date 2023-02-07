@@ -6,6 +6,7 @@ import { ModeType, TransactionStatus, TransactionType } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
+import { AdminService } from '../admin/admin.service';
 import { UserEntity } from '../user/entities/user.entity';
 import { TransactionQuery } from './dto/transaction-query.dto';
 import { TransactionEntity } from './transaction.entity';
@@ -16,6 +17,7 @@ export class TransactionService {
   logger = new Logger('TransactionService');
 
   constructor(
+    private adminSvc: AdminService,
     @InjectRepository(TransactionEntity) private readonly transRepo: Repository<TransactionEntity>) {}
 
     async getPaymentReference(user: UserEntity): Promise<IClientReturnObject> {
@@ -69,14 +71,17 @@ export class TransactionService {
 
     async writeSavingsCharge(transaction: TransactionEntity, email: string, amount: number, queryRunner: QueryRunner): Promise<any> {
         
+        const setting = await this.adminSvc.getSetting();
+        const finalAmount = (amount * setting.chargesOnSavings) / 100
+
         const data = {
             userId: transaction.userId,
-            amount,
+            amount: finalAmount,
             reference: transaction.reference,
             transactionDate: new Date(),
             transactionType: TransactionType.CREDIT,
             status: TransactionStatus.COMPLETED,    
-            description: `${transaction.reference} - 1% charge on your ${amount} saving`,
+            description: `${transaction.reference} - ${setting.chargesOnSavings}% charge on your ${amount} quick save deposit`,
             mode: ModeType.MANUAL,
             createdBy: email
         }

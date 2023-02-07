@@ -103,5 +103,8 @@ export class AdminService {
              return await this.stRepo.findOne({where: {name: 'Stepupbank'}});
         }
 
+        async getSetting (): Promise<AdminSettingEntity> {
+            return await this.admSetRepo.findOne({where: {}});
+        }
   }
 

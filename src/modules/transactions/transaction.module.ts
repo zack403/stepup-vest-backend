@@ -6,6 +6,7 @@ import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 import { TransactionEntity } from './transaction.entity';
 import { AuthModule } from '../auth/auth.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { AuthModule } from '../auth/auth.module';
       TransactionEntity,
     ]),
     HttpModule,
-    AuthModule
+    AuthModule,
+    AdminModule
   ],
   controllers: [TransactionController],
   providers: [TransactionService, HttpRequestService],
