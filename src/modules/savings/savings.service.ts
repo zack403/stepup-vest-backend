@@ -6,6 +6,7 @@ import { ModeType, TransactionStatus, TransactionType } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { QueryRunner, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
+import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
 import { TransactionService } from '../transactions/transaction.service';
 import { UserEntity } from '../user/entities/user.entity';
 import { SavingsEntity } from './savings.entity';
@@ -83,8 +84,16 @@ export class SavingsService {
       return await this.adminSvc.getSavingsType();
     }
 
-    async updateOrSaveSavings(user: UserEntity, amount: any, queryRunner: QueryRunner): Promise<any> {
-        const savingType = await this.adminSvc.getStepUpSavingsType();
+    async updateOrSaveSavings(user: UserEntity, amount: any, queryRunner: QueryRunner, typeId?: string): Promise<any> {
+        
+        let savingType: SavingsTypeEntity;
+
+        if(typeId) {
+            savingType = await this.adminSvc.getSavingsTypeById(typeId);
+        } else {
+            savingType = await this.adminSvc.getStepUpSavingsType();
+        }
+            
         const saving = await this.getSavingsByType(user.id, savingType.id);
         
         if(saving) {
