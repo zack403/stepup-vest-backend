@@ -84,6 +84,13 @@ export class SavingsService {
       return await this.adminSvc.getSavingsType();
     }
 
+
+    async getSavingsTypeByName(name: string): Promise<IClientReturnObject> {
+    
+      return await this.adminSvc.getSavingsTypeByName(name);
+    }
+
+
     async updateOrSaveSavings(user: UserEntity, amount: any, queryRunner: QueryRunner, typeId?: string): Promise<any> {
         
         let savingType: SavingsTypeEntity;

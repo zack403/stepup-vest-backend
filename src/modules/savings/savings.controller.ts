@@ -44,21 +44,33 @@ export class SavingsController {
     res.status(result.status).json(result);
   }
 
+  @Get('savings-type/:name')
+  @ApiOperation({summary: 'Savings type returned successfully'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Savings returned successfully' })
+  async getSavingsTypeByName(
+    @Param('name') name: string,
+      @Res() res: Response) : Promise<void> 
+  {
+    const result = await this.savSvc.getSavingsTypeByName(name);
+    res.status(result.status).json(result);
+  }
+
 
   @Get(':typeId')
-  @ApiOperation({ summary: 'Get saving by type' })
+  @ApiOperation({ summary: 'Get savings by type' })
   @ApiResponse({ status: 200, description: 'Returns saving by type' })
-  async findOne(@Res() res: Response, @Param('typeId') typeId: string, @Req() req: any):Promise<IClientReturnObject> {
+  async findOne(@Res() res: Response, @Param('typeId') typeId: string, @Req() req: any):Promise<any> {
     
     try {
 
-      const result = await this.savSvc.getSavingsByType(req.user, typeId);
-    
-      return clientFeedback({
+      const result = await this.savSvc.getSavingsByType(req.user.id, typeId);
+
+      res.status(200).json({
         status: 200,
         data: result,
         message: 'Fetched successfully'
-      })
+      });
       
     } catch (error) {
       console.log(error);
