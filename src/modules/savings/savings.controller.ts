@@ -53,7 +53,7 @@ export class SavingsController {
     @Req() req: any,
       @Res() res: Response) : Promise<void> 
   {
-    const result = await this.savSvc.getSavingsByTypeSlug(req.user, slug);
+    const result = await this.savSvc.getSavingsByTypeSlug(req.user.id, slug);
     res.status(result.status).json(result);
   }
 
