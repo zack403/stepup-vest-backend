@@ -138,9 +138,22 @@ export class AppService {
             await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner);
 
             this.logger.log("savings updated updated");
-            
             break;
-        
+
+          case ModeType.MANUAL:
+
+            const d = {
+              amount,
+              status: TransactionStatus.COMPLETED,
+              transactionDate: new Date()
+            }
+
+            await this.transSvc.updateTransactionByReference(transaction.reference, d, queryRunner);
+
+            await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner, transaction.savingTypeId);
+
+            break;
+            
           default:
             break;
         }
