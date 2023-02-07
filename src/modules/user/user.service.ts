@@ -6,6 +6,7 @@ import { JwtPayload } from 'src/types/jwtPayload';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
+import { SavingsService } from '../savings/savings.service';
 import { AddBankDetailsDto } from './dto/add-bank-details.dto';
 import { AddCardDto } from './dto/add-card.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,6 +22,7 @@ export class UserService {
   constructor(
     @InjectRepository(BankDetailsEntity) private bdRepo: Repository<BankDetailsEntity>,
     @InjectRepository(CardEntity) private cardRepo: Repository<CardEntity>,
+    private savingSvc: SavingsService,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {}
 
   async addBankDetails(req: AddBankDetailsDto, user: UserEntity): Promise<IClientReturnObject> {
@@ -362,6 +364,30 @@ async findByUserId(id: string):Promise<UserEntity> {
         debitCardAdded: true
       }
     );
+  }
+
+  async getStats(user: UserEntity): Promise<any> {
+    try {
+
+      const {totalsavings} = await this.savingSvc.getTotalSavings(user.id);
+      const totalWithdrawals = 0;
+      const loanEgibility = 0;
+      const referralBonus = user.referralBalance;
+
+      return clientFeedback( {
+        status: 200,
+        message: 'Dashboard stats fetched successfully',
+        data: {
+          totalSavings: totalsavings || 0,
+          totalWithdrawals,
+          loanEgibility,
+          referralBonus
+        }
+      })
+
+    } catch (error) {
+      
+    }
   }
 
   async removeCard(cardId, user: UserEntity): Promise<IClientReturnObject> {

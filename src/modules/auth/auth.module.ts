@@ -10,6 +10,9 @@ import { PasswordResetEntity } from './entities/password-reset.entity';
 import { EmailService } from '../../services/email/email.service';
 import { UserService } from '../user/user.service';
 import { UserModule } from '../user/user.module';
+import { SavingsService } from '../savings/savings.service';
+import { AdminService } from '../admin/admin.service';
+import { TransactionService } from '../transactions/transaction.service';
 
 @Module({
   imports: [
@@ -26,7 +29,10 @@ import { UserModule } from '../user/user.module';
     AuthService, 
     JwtStrategy, 
     EmailService,
-    UserService
+    UserService,
+    SavingsService,
+    AdminService,
+    TransactionService
   ],
   exports: [PassportModule]
 })

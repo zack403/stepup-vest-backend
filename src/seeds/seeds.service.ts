@@ -71,29 +71,34 @@ export class SeedsService implements OnModuleInit {
             {
                 name: 'Stepupbank',
                 currency: 'NGN',
+                slug: 'stepupbank',
                 disabled: false,
                 createdBy: 'admin'
             },
             {
                 name: 'Flex Naira',
                 currency: 'NGN',
+                slug: 'flexnaira',
                 disabled: true,
                 createdBy: 'admin'
             },
             {
                 name: 'Safelock',
+                slug: 'safelock',
                 currency: 'NGN',
                 disabled: true,
                 createdBy: 'admin'
             },
             {
                 name: 'Targets',
+                slug: 'targets',
                 currency: 'NGN',
                 disabled: true,
                 createdBy: 'admin'
             },
             {
                 name: 'Flex Dollar',
+                slug: 'flexdollar',
                 currency: 'NGN',
                 disabled: true,
                 createdBy: 'admin'
@@ -101,6 +106,7 @@ export class SeedsService implements OnModuleInit {
             {
                 name: 'PocketApp',
                 currency: 'NGN',
+                slug: 'pocketapp',
                 disabled: true,
                 createdBy: 'admin'
             }

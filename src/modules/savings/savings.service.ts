@@ -57,7 +57,7 @@ export class SavingsService {
       return await this.saveRepo.createQueryBuilder("s")
       .where("s.userId = :userId", {userId})
       .select("SUM(s.balance) AS totalSavings")
-      .getOne();
+      .getRawOne();
 
     }
 

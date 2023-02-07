@@ -64,6 +64,16 @@ export class UserController {
     const result = await this.userService.removeCard(cardId, req.user);
     res.status(result.status).json(result);
   }
+
+  
+  @Get('dashboard/statistics')
+  @ApiOperation({ summary: 'Get all my transaction and savings balance statistics on dashboard'})
+  @ApiResponse({ status: 200, description: 'Return all all my transaction and savings balance statistics on dashboard'})
+  async getStats(@Res() res: Response,  @Req() req: any): Promise<void> {
+    const result = await this.userService.getStats(req.user);
+    res.status(result.status).json(result);
+  }
+
   
   @Get(':id')
   @ApiOperation({ summary: 'Get a user account' })
@@ -82,5 +92,4 @@ export class UserController {
     res.status(result.status).json(result);
   }
 
-  
 }

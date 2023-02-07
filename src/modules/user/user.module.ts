@@ -6,18 +6,29 @@ import { UserEntity } from './entities/user.entity';
 import { BankDetailsEntity } from './entities/bank-details.entity';
 import { CardEntity } from './entities/card.entity';
 import { PassportModule } from '@nestjs/passport';
+import { SavingsService } from '../savings/savings.service';
+import { AdminService } from '../admin/admin.service';
+import { TransactionService } from '../transactions/transaction.service';
+import { SavingsEntity } from '../savings/savings.entity';
+import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
+import { AdminSettingEntity } from '../admin/entities/setting.entity';
+import { TransactionEntity } from '../transactions/transaction.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       UserEntity,
       BankDetailsEntity,
-      CardEntity
+      CardEntity,
+      SavingsEntity,
+      SavingsTypeEntity,
+      AdminSettingEntity,
+      TransactionEntity
     ]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    PassportModule.register({ defaultStrategy: 'jwt' })
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, SavingsService, AdminService, TransactionService],
   exports: [ TypeOrmModule]
 })
 export class UserModule {}
