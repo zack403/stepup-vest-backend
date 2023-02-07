@@ -44,15 +44,16 @@ export class SavingsController {
     res.status(result.status).json(result);
   }
 
-  @Get('savings-type/:name')
-  @ApiOperation({summary: 'Savings type returned successfully'})
+  @Get('/type/:slug')
+  @ApiOperation({summary: 'Savings returned successfully'})
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 201, description: 'Savings returned successfully' })
-  async getSavingsTypeByName(
-    @Param('name') name: string,
+  async getSavingsByTypeSlug(
+    @Param('slug') slug: string,
+    @Req() req: any,
       @Res() res: Response) : Promise<void> 
   {
-    const result = await this.savSvc.getSavingsTypeByName(name);
+    const result = await this.savSvc.getSavingsByTypeSlug(req.user, slug);
     res.status(result.status).json(result);
   }
 

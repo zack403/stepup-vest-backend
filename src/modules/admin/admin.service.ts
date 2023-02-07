@@ -91,13 +91,8 @@ export class AdminService {
             })
         }
 
-        async getSavingsTypeByName(name: string): Promise<IClientReturnObject> {
-            const sts = await this.stRepo.find({where: {name}});
-            return clientFeedback ({
-                status: 200,
-                message: 'Savings type fetched successfully',
-                data: sts
-            })
+        async getSavingsTypeBySlug(slug: string): Promise<SavingsTypeEntity> {
+            return await this.stRepo.findOne({where: {slug}});
         }
 
         async getSavingsTypeById(id): Promise<SavingsTypeEntity> {

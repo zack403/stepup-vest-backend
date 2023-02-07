@@ -27,6 +27,40 @@ export class SavingsService {
       return await this.saveRepo.findOne({where: {userId, savingsTypeId}});
     }
 
+    
+    async getSavingsByTypeSlug(userId: string, slug): Promise<IClientReturnObject> {
+      
+      try {
+        const stype = await this.adminSvc.getSavingsTypeBySlug(slug);
+        if(!stype) {
+          return clientFeedback( {
+            status: 400,
+            message: 'not found'
+          })
+        }
+  
+        const result = await this.saveRepo.findOne({where: {userId, savingsTypeId: stype.id}});
+  
+        return clientFeedback( {
+          status: 200,
+          message: '',
+          data: result
+        })  
+
+      } catch (error) {
+        console.log(error);
+      }
+      
+    }
+
+    async getTotalSavings(userId): Promise<any> {
+      return await this.saveRepo.createQueryBuilder("s")
+      .where("s.userId = :userId", {userId})
+      .select("SUM(s.balance) AS totalSavings")
+      .getOne();
+
+    }
+
     async getSavings(user: UserEntity): Promise<IClientReturnObject> {
       try {
         
@@ -39,7 +73,11 @@ export class SavingsService {
         });
 
       } catch (error) {
-         console.log(error);
+        this.logger.error(`Something failed - ${error.message} ${error}`);
+        return clientFeedback({
+            status: 500,
+            message: `Something failed - ${error.message}`
+        })
       }
     }
 
@@ -82,12 +120,6 @@ export class SavingsService {
     async getSavingsType(): Promise<IClientReturnObject> {
     
       return await this.adminSvc.getSavingsType();
-    }
-
-
-    async getSavingsTypeByName(name: string): Promise<IClientReturnObject> {
-    
-      return await this.adminSvc.getSavingsTypeByName(name);
     }
 
 
