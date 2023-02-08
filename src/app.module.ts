@@ -13,6 +13,7 @@ import { TransactionService } from './modules/transactions/transaction.service';
 import { UserModule } from './modules/user/user.module';
 import { UserService } from './modules/user/user.service';
 import { VerificationModule } from './modules/verification/verification.module';
+import { WithdrawalsModule } from './modules/withdrawals/withdrawal.module';
 import { SeedsModule } from './seeds/seeds.module';
 import { HttpRequestService } from './utils/http-request';
 
@@ -28,7 +29,8 @@ import { HttpRequestService } from './utils/http-request';
     AdminModule,
     TransactionModule,
     SavingsModule,
-    SeedsModule
+    SeedsModule,
+    WithdrawalsModule
   ],
   controllers: [AppController],
   providers: [AppService, HttpRequestService, TransactionService, UserService],

@@ -13,6 +13,8 @@ import { UserModule } from '../user/user.module';
 import { SavingsService } from '../savings/savings.service';
 import { AdminService } from '../admin/admin.service';
 import { TransactionService } from '../transactions/transaction.service';
+import { HttpModule } from '@nestjs/axios';
+import { HttpRequestService } from 'src/utils/http-request';
 
 @Module({
   imports: [
@@ -22,7 +24,8 @@ import { TransactionService } from '../transactions/transaction.service';
       EmailVerificationEntity,
       PasswordResetEntity,
     ]),
-    UserModule
+    UserModule,
+    HttpModule
   ],
   controllers: [AuthController],
   providers: [
@@ -32,7 +35,8 @@ import { TransactionService } from '../transactions/transaction.service';
     UserService,
     SavingsService,
     AdminService,
-    TransactionService
+    TransactionService,
+    HttpRequestService
   ],
   exports: [PassportModule]
 })

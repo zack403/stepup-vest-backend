@@ -102,4 +102,29 @@ export class HttpRequestService {
           }
     }
 
+    async createTransferRecipient(payload: any): Promise<any> {
+      try {
+        const result = await lastValueFrom(this.httpService.post(
+            `${this.configSvc.get("PAYSTACK_BASE_URL")}transferrecipient`, 
+            payload,
+            this.payStackRequestHeaders
+          ).pipe(map(r => r.data)));
+
+          if(result.status) {
+        
+            return result;  
+          }
+
+          return result;
+        
+      } catch (error) {
+          
+          return clientFeedback({
+              message:  `Something failed, ${error.response.data.message}`,
+              status: 500,
+              trace: error
+          })
+      }
+  }
+
 }

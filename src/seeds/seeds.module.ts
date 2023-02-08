@@ -1,22 +1,22 @@
+import { HttpModule } from "@nestjs/axios";
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { AdminModule } from "src/modules/admin/admin.module";
 import { AdminService } from "src/modules/admin/admin.service";
-import { AdminSettingEntity } from "src/modules/admin/entities/setting.entity";
 import { SavingsService } from "src/modules/savings/savings.service";
 import { TransactionService } from "src/modules/transactions/transaction.service";
-import { UserEntity } from "src/modules/user/entities/user.entity";
 import { UserModule } from "src/modules/user/user.module";
 import { UserService } from "src/modules/user/user.service";
+import { HttpRequestService } from "src/utils/http-request";
 import { SeedsService } from "./seeds.service";
 
 
 @Module({
     imports: [
         UserModule,
-        AdminModule
+        AdminModule,
+        HttpModule
     ],
-    providers: [SeedsService, UserService, AdminService, SavingsService, TransactionService]
+    providers: [SeedsService, UserService, AdminService, SavingsService, TransactionService, HttpRequestService]
 })
 
 export class SeedsModule {}
