@@ -57,6 +57,7 @@ export class SeedsService implements OnModuleInit {
     async saveAdminSetting () {
         const payload = {
             referralAmount: 1000,
+            percentageChargeOnSavings: 3.335,
             createdBy: 'admin'
         }
 

@@ -72,7 +72,7 @@ export class TransactionService {
     async writeSavingsCharge(transaction: TransactionEntity, email: string, amount: number, queryRunner: QueryRunner): Promise<any> {
         
         const setting = await this.adminSvc.getSetting();
-        const finalAmount = (amount * setting.chargesOnSavings) / 100
+        const finalAmount = (amount * setting.percentageChargeOnWithdrawals) / 100
 
         const data = {
             userId: transaction.userId,
@@ -81,7 +81,7 @@ export class TransactionService {
             transactionDate: new Date(),
             transactionType: TransactionType.DEBIT,
             status: TransactionStatus.COMPLETED,    
-            description: `${transaction.reference} - ${setting.chargesOnSavings}% charge on your ${amount} quick save deposit`,
+            description: `${transaction.reference} - ${setting.percentageChargeOnWithdrawals}% charge on your ${amount} quick save deposit`,
             mode: ModeType.MANUAL,
             createdBy: email
         }

@@ -13,6 +13,8 @@ import { SavingsEntity } from '../savings/savings.entity';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
 import { AdminSettingEntity } from '../admin/entities/setting.entity';
 import { TransactionEntity } from '../transactions/transaction.entity';
+import { HttpRequestService } from 'src/utils/http-request';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -25,10 +27,11 @@ import { TransactionEntity } from '../transactions/transaction.entity';
       AdminSettingEntity,
       TransactionEntity
     ]),
-    PassportModule.register({ defaultStrategy: 'jwt' })
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    HttpModule
   ],
   controllers: [UserController],
-  providers: [UserService, SavingsService, AdminService, TransactionService],
-  exports: [ TypeOrmModule]
+  providers: [UserService, SavingsService, AdminService, TransactionService, HttpRequestService],
+  exports: [ TypeOrmModule, UserService]
 })
 export class UserModule {}

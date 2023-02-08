@@ -16,6 +16,9 @@ export class BankDetailsEntity extends AbstractBaseEntity {
   @Column({type: "varchar",  length: 128})
   bankCode: string;
 
+  @Column({type: "varchar",  length: 128})
+  recipientCode: string;
+
   @Column({type: "varchar"})
   accountNumber: string;
   

@@ -154,7 +154,7 @@ export class AppService {
 
             await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner, transaction.savingTypeId);
 
-            await this.transSvc.writeSavingsCharge(transaction, user.email, amount, queryRunner);
+            //await this.transSvc.writeSavingsCharge(transaction, user.email, amount, queryRunner);
 
             break;
             

@@ -6,5 +6,9 @@ export class AdminSettingsDto {
     @ApiProperty()  
     @IsNotEmpty()
     referralAmount: number;
+
+    @ApiProperty()  
+    @IsNotEmpty()
+    percentageChargeOnWithdrawals: number;
         
 }

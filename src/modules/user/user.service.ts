@@ -4,6 +4,7 @@ import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { JwtPayload } from 'src/types/jwtPayload';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
+import { HttpRequestService } from 'src/utils/http-request';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { SavingsService } from '../savings/savings.service';
@@ -23,6 +24,7 @@ export class UserService {
     @InjectRepository(BankDetailsEntity) private bdRepo: Repository<BankDetailsEntity>,
     @InjectRepository(CardEntity) private cardRepo: Repository<CardEntity>,
     private savingSvc: SavingsService,
+    private httpReqSvc: HttpRequestService,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {}
 
   async addBankDetails(req: AddBankDetailsDto, user: UserEntity): Promise<IClientReturnObject> {
@@ -56,11 +58,25 @@ export class UserService {
           }
 
 
-          const data = plainToClass(BankDetailsEntity, req);
-          data.createdBy = user.email;
-          data.userId = user.id;
+          const mapped = plainToClass(BankDetailsEntity, req);
+          mapped.createdBy = user.email;
+          mapped.userId = user.id;
     
-          const saved = await this.bdRepo.save(data);
+          const payload = { 
+              type: "nuban", 
+              name: req.accountName, 
+              account_number: req.accountNumber, 
+              bank_code: req.bankCode, 
+              currency: "NGN"
+          }
+
+          const result = await this.httpReqSvc.createTransferRecipient(payload);
+          const {data} = result;
+          if(data && data.recipient_code) {
+             mapped.recipientCode = data.recipient_code;
+          }
+        
+          const saved = await this.bdRepo.save(mapped);
 
           await this.userRepo.update(
             {
@@ -420,4 +436,10 @@ async findByUserId(id: string):Promise<UserEntity> {
     }
         
   }
+
+  async userHasBankAccount(userId: string): Promise<boolean> {
+    const bank = await this.bdRepo.findOne({where: {userId}});
+    if(bank) return true;
+    return false;
+  } 
 }

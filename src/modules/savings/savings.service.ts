@@ -43,7 +43,7 @@ export class SavingsService {
   
         return clientFeedback( {
           status: 200,
-          message: '',
+          message: 'Fetched successfully',
           data: result
         })  
 
