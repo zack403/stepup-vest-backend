@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
+import { TransactionStatus } from 'src/utils/enum';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
 import { SavingsService } from '../savings/savings.service';
 import { UserEntity } from '../user/entities/user.entity';
@@ -39,6 +40,13 @@ export class WithdrawalService {
             })
           }
 
+          if(!await this.canWithdrawNow(user.id)) {
+            return clientFeedback({
+              status: 400,
+              message: 'You cannot carry out this transaction as you have a pending one.'
+            })
+          }
+
           if(!await this.userSvc.userHasBankAccount(user.id)) {
             return clientFeedback({
                 status: 400,
@@ -65,13 +73,15 @@ export class WithdrawalService {
           const setting = await this.admSvc.getSetting();
 
           const amountCharged = (req.amountToWithdraw * setting.percentageChargeOnWithdrawals) / 100;
+          const amountToDisburse = req.amountToWithdraw - amountCharged;
 
           const data = plainToClass(WithdrawalEntity, req);
           data.createdBy = user.email;
           data.userId = user.id;
           data.amountCharged = amountCharged;
           data.percentageCharged = `${setting.percentageChargeOnWithdrawals}%`;
-          
+          data.amountToDisburse = amountToDisburse;
+
           const saved = await this.withRepo.save(data);
 
           return clientFeedback({
@@ -260,9 +270,12 @@ export class WithdrawalService {
         const setting = await this.admSvc.getSetting();
 
         const amountCharged = (payload.amountToWithdraw * setting.percentageChargeOnWithdrawals) / 100;
+        const amountToDisburse = payload.amountToWithdraw - amountCharged;
+
 
         withdrawal.amountCharged = amountCharged;
         withdrawal.percentageCharged = `${setting.percentageChargeOnWithdrawals}`;
+        withdrawal.amountToDisburse = amountToDisburse;
       }
 
       withdrawal.updatedAt = new Date();
@@ -368,6 +381,21 @@ export class WithdrawalService {
             message: 'something failed'
         })   
     }
+  }
 
+  async canWithdrawNow(userId: string): Promise<boolean> {
+      const result = await this.withRepo.createQueryBuilder("w")
+      .where("w.userId = :userId", {userId})
+      .andWhere("w.approved = :app", {app: true})
+      .andWhere(new Brackets(qb => {
+         qb.where("w.status = :st", {st: TransactionStatus.COMPLETED})
+         .orWhere("w.status = :s", {s: TransactionStatus.FAILED})
+      })).getOne();
+
+      if(result) {
+         return true;
+      }
+
+      return false;
   }
 }

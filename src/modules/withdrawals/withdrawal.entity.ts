@@ -16,6 +16,9 @@ export class WithdrawalEntity extends AbstractBaseEntity {
     @Column({ type: 'numeric', precision: 10, scale: 2})
     amountCharged: number;
 
+    @Column({ type: 'numeric', default: 0, precision: 10, scale: 2})
+    amountToDisburse: number;
+
     @Column({ type: 'varchar'})
     percentageCharged: string;
 
