@@ -14,4 +14,10 @@ export class GeneralQueryParams  {
     @IsOptional()
     @Type(() => Number)
     limit: number;
+
+    
+    @ApiPropertyOptional({default: 15})
+    @IsOptional()
+    @Type(() => Number)
+    search: number;
 }

@@ -5,7 +5,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { WithdrawalService } from './withdrawal.service';
 import { UpdateWithdrawalDto } from './dto/update-withdrawal.dto';
 import { RequestWithdrawlDto } from './dto/request-withdrawal.dto';
-import { GeneralQueryParams } from 'src/utils/general-query-param';
+import { WithdrawalQuery } from './dto/withdrawal-query.dto';
 
 @ApiTags('Withdrawal')
 @ApiBearerAuth()
@@ -32,9 +32,18 @@ export class WithdrawalController {
   @Get()
   @ApiOperation({ summary: 'Get all withdrawals'})
   @ApiResponse({ status: 200, description: 'Return all withdrawals'})
-  async findAll(@Res() res: Response, @Query() query: GeneralQueryParams,  @Req() req: any): Promise<void> {
+  async findAll(@Res() res: Response, @Query() query: WithdrawalQuery,  @Req() req: any): Promise<void> {
   
     const result = await this.withService.findAll(query, req.user);
+    res.status(result.status).json(result);
+  }
+
+  @Get('me')
+  @ApiOperation({ summary: 'Get all my withdrawals'})
+  @ApiResponse({ status: 200, description: 'Return all my withdrawals'})
+  async findMyWithdrawals(@Res() res: Response, @Query() query: WithdrawalQuery,  @Req() req: any): Promise<void> {
+  
+    const result = await this.withService.findMyWithdrawals(query, req.user);
     res.status(result.status).json(result);
   }
 
