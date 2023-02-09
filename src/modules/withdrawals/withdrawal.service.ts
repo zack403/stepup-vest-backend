@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { GeneralQueryParams } from 'src/utils/general-query-param';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
 import { Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
@@ -12,6 +11,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { RequestWithdrawlDto } from './dto/request-withdrawal.dto';
 import { UpdateWithdrawalDto } from './dto/update-withdrawal.dto';
+import { WithdrawalQuery } from './dto/withdrawal-query.dto';
 import { WithdrawalEntity } from './withdrawal.entity';
 
 
@@ -92,7 +92,7 @@ export class WithdrawalService {
   }
 
  
-  async findAll({page, limit}: GeneralQueryParams, user: UserEntity): Promise<IClientReturnObject> {
+  async findAll({page, limit, status}: WithdrawalQuery, user: UserEntity): Promise<IClientReturnObject> {
     try {
 
         if(!user.isAdmin) {
@@ -102,13 +102,25 @@ export class WithdrawalService {
             })
         }
 
-        const withdrawals =  await this.withRepo.find({ 
-            order: {createdAt: 'DESC'},
-            skip: page ? limit * (page - 1) : 0,
-            take: limit, 
-        });
+        let withdrawals: WithdrawalEntity[] = [];
 
+        if(status) {
+            withdrawals =  await this.withRepo.find({
+                where: {status}, 
+                order: {createdAt: 'DESC'},
+                skip: page ? limit * (page - 1) : 0,
+                take: limit, 
+            });
+        } else {
+            withdrawals =  await this.withRepo.find({ 
+                order: {createdAt: 'DESC'},
+                skip: page ? limit * (page - 1) : 0,
+                take: limit, 
+            });
+    
+        }
 
+        
         return clientFeedback({
             message: "Success",
             data: withdrawals,
@@ -123,6 +135,47 @@ export class WithdrawalService {
     }
     
   }
+  
+  async findMyWithdrawals({page, limit, status}: WithdrawalQuery, user: UserEntity): Promise<IClientReturnObject> {
+    try {
+
+        let withdrawals: WithdrawalEntity[] = [];
+
+        if (status) {
+            withdrawals =  await this.withRepo.find({
+                where: {userId: user.id, status}, 
+                order: {createdAt: 'DESC'},
+                skip: page ? limit * (page - 1) : 0,
+                take: limit, 
+            });
+    
+        } else {
+            withdrawals =  await this.withRepo.find({
+                where: {userId: user.id}, 
+                order: {createdAt: 'DESC'},
+                skip: page ? limit * (page - 1) : 0,
+                take: limit, 
+            });
+    
+        }
+
+        
+        return clientFeedback({
+            message: "Success",
+            data: withdrawals,
+            status: 200
+        })
+
+    } catch (error) {
+      return clientFeedback({
+        message:  `Something failed, ${error.message}`,
+        status: 500
+      })
+    }
+    
+  }
+
+
 
   async findOne(id: string):Promise<IClientReturnObject> {
     if(!id) {
