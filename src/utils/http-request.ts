@@ -1,5 +1,5 @@
 import { HttpService } from "@nestjs/axios";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { lastValueFrom, map } from "rxjs";
 import { VerifyAccountDto } from "src/modules/verification/dto/verify-account.dto";
@@ -7,6 +7,9 @@ import { clientFeedback } from "./clientReturnfunction";
 
 @Injectable()
 export class HttpRequestService {
+
+  logger = new Logger('HttpRequestService');
+
 
     constructor(private httpService: HttpService, private configSvc: ConfigService) {}
 
@@ -143,7 +146,7 @@ export class HttpRequestService {
         return result;
       
     } catch (error) {
-        
+        this.logger.log(`error in paystack init transfer - ${error} - ${error.message}`)
         return clientFeedback({
             message:  `Something failed, ${error.response.data.message}`,
             status: 500,
