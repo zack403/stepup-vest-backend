@@ -3,9 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { TransactionStatus } from 'src/utils/enum';
+import { WithdrawalStatus } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
-import { generateUniqueCode } from 'src/utils/generate-unique-code';
 import { HttpRequestService } from 'src/utils/http-request';
 import { Brackets, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
@@ -397,8 +396,8 @@ export class WithdrawalService {
         .leftJoinAndSelect("w.user", "user")
         .where("w.approved = :app", {app: true})
         .andWhere(new Brackets(qb => {
-          qb.where("w.status = :st", {st: TransactionStatus.PENDING})
-          .orWhere("w.status = :s", {s: TransactionStatus.FAILED})
+          qb.where("w.status = :st", {st: WithdrawalStatus.PENDING})
+          .orWhere("w.status = :s", {s: WithdrawalStatus.FAILED})
         })).getMany();
 
         if(result.length > 0) {
@@ -434,8 +433,8 @@ export class WithdrawalService {
       .where("w.userId = :userId", {userId})
       .andWhere("w.approved = :app", {app: true})
       .andWhere(new Brackets(qb => {
-         qb.where("w.status = :st", {st: TransactionStatus.COMPLETED})
-         .orWhere("w.status = :s", {s: TransactionStatus.FAILED})
+         qb.where("w.status = :st", {st: WithdrawalStatus.PAID})
+         .orWhere("w.status = :s", {s: WithdrawalStatus.FAILED})
       })).getOne();
 
       if(result) {
