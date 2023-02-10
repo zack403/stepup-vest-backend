@@ -273,7 +273,7 @@ async findByUserId(id: string):Promise<UserEntity> {
   const user = await this.userRepo.findOne({where: {id}});
   
   if(user) {
-    delete user.password;
+    //delete user.password;
     delete user.isAdmin;
   }
   
