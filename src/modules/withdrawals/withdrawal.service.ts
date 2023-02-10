@@ -394,6 +394,7 @@ export class WithdrawalService {
 
         this.logger.log("initiating transfer");
         const result = await this.withRepo.createQueryBuilder("w")
+        .leftJoinAndSelect("w.user", "user")
         .where("w.approved = :app", {app: true})
         .andWhere(new Brackets(qb => {
           qb.where("w.status = :st", {st: TransactionStatus.PENDING})
@@ -409,9 +410,9 @@ export class WithdrawalService {
               const payload = { 
                 source: "balance", 
                 amount,
-                reference: generateUniqueCode(), 
+                reference: r.reference, 
                 recipient: bankDetails.recipientCode, 
-                reason:  `Withdrawing ${r.amountToDisburse} for user` 
+                reason: `Withdrawing ${r.amountToDisburse} for ${r.user.email}` 
               }
 
               const response = await this.httpReqSvc.initiateTransfer(payload);
@@ -425,7 +426,7 @@ export class WithdrawalService {
   }
 
   async findWithdrawalByReference(reference): Promise<WithdrawalEntity> {
-    return await this.withRepo.findOne({where: {reference}});
+    return await this.withRepo.findOne({where: {reference}, relations: ['user', 'savingsType']});
 }
 
   async canWithdrawNow(userId: string): Promise<boolean> {

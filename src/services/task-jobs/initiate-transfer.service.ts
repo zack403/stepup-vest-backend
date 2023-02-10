@@ -13,7 +13,7 @@ export class InitiateTransferService {
        private withdrawalSvc: WithdrawalService
     ){}
 
-    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    @Cron(CronExpression.EVERY_10_MINUTES)
     async handle() {
       this.logger.log("Transfer initiation service started");
       
