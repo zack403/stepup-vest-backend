@@ -391,7 +391,6 @@ export class WithdrawalService {
 
     if(set.withdrawalDay === today.getDate()) {
 
-        this.logger.log("initiating transfer");
         const result = await this.withRepo.createQueryBuilder("w")
         .leftJoinAndSelect("w.user", "user")
         .where("w.approved = :app", {app: true})
@@ -401,6 +400,7 @@ export class WithdrawalService {
         })).getMany();
 
         if(result.length > 0) {
+          this.logger.log("initiating transfer");
           for (const r of result) {
             const bankDetails = await this.userSvc.getOneUserBankDetails(r.userId);
              if(bankDetails) {
