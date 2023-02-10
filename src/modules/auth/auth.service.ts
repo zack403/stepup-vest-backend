@@ -48,7 +48,7 @@ export class AuthService {
 
       if(exist) {
         return clientFeedback({
-          status: 200,
+          status: 400,
           message: 'Email already exist'
         })
       }
@@ -57,7 +57,7 @@ export class AuthService {
 
       if(phoneexist) {
         return clientFeedback({
-          status: 200,
+          status: 400,
           message: 'Phone number already exist'
         })
       }
@@ -197,7 +197,7 @@ export class AuthService {
       if (!user) {
         return clientFeedback({
           message: 'User does not exist',
-          status: 400
+          status: 404
         })
       }
 
@@ -265,7 +265,7 @@ export class AuthService {
         if (!user) {
           return clientFeedback({
             message: 'User does not exist',
-            status: 400
+            status: 404
           })
         }
 

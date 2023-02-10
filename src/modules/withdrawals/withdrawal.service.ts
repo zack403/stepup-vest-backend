@@ -37,7 +37,7 @@ export class WithdrawalService {
 
           if(!exist) {
             return clientFeedback({
-                status: 400,
+                status: 404,
                 message: 'Plan does not exist'
             })
           }
@@ -109,7 +109,7 @@ export class WithdrawalService {
 
         if(!user.isAdmin) {
             return clientFeedback({
-                status: 400,
+                status: 403,
                 message: 'Access denied'
             })
         }
@@ -225,13 +225,13 @@ export class WithdrawalService {
       if(!withdrawal) {
         return clientFeedback({
           message:  "Withdrawal not found",
-          status: 400
+          status: 404
         })
       }
 
       if(withdrawal.approved) {
         return clientFeedback( {
-            status: 200,
+            status: 400,
             message: 'Withdrawal approved and cannot be updated'
         })
       }
@@ -240,7 +240,7 @@ export class WithdrawalService {
 
         if(!exist) {
         return clientFeedback({
-            status: 400,
+            status: 404,
             message: 'Plan does not exist'
         })
       }
@@ -312,7 +312,7 @@ export class WithdrawalService {
         if(!withdrawal) {
             return clientFeedback({
               message:  "Withdrawal not found",
-              status: 400
+              status: 404
             })
         }
     
@@ -346,7 +346,7 @@ export class WithdrawalService {
     try {
         if(!user.isAdmin) {
             return clientFeedback({
-                status: 400,
+                status: 403,
                 message: 'Access denied'
             })
         }
@@ -354,13 +354,13 @@ export class WithdrawalService {
         if(!withdrawal) {
             return clientFeedback({
               message:  "Withdrawal not found",
-              status: 400
+              status: 404
             })
         }
     
         if(withdrawal.approved) {
             return clientFeedback( {
-                status: 200,
+                status: 400,
                 message: 'Withdrawal approved already'
             })
         }
@@ -492,7 +492,7 @@ export class WithdrawalService {
 
   async findWithdrawalByReference(reference): Promise<WithdrawalEntity> {
     return await this.withRepo.findOne({where: {reference}, relations: ['user', 'savingsType']});
-}
+  }
 
   async canWithdrawNow(userId: string): Promise<boolean> {
       const result = await this.withRepo.createQueryBuilder("w")
@@ -504,9 +504,9 @@ export class WithdrawalService {
       })).getOne();
 
       if(result) {
-         return false;
+         return true;
       }
 
-      return true;
+      return false;
   }
 }

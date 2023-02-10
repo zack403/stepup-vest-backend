@@ -1,13 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { JwtPayload } from 'src/types/jwtPayload';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
+import { WithdrawalStatus } from 'src/utils/enum';
 import { HttpRequestService } from 'src/utils/http-request';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { SavingsService } from '../savings/savings.service';
+import { WithdrawalEntity } from '../withdrawals/withdrawal.entity';
+import { WithdrawalService } from '../withdrawals/withdrawal.service';
 import { AddBankDetailsDto } from './dto/add-bank-details.dto';
 import { AddCardDto } from './dto/add-card.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -24,6 +27,7 @@ export class UserService {
     @InjectRepository(BankDetailsEntity) private bdRepo: Repository<BankDetailsEntity>,
     @InjectRepository(CardEntity) private cardRepo: Repository<CardEntity>,
     private savingSvc: SavingsService,
+    @InjectRepository(WithdrawalEntity) private readonly withdrawalRepo: Repository<WithdrawalEntity>,
     private httpReqSvc: HttpRequestService,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {}
 
@@ -31,67 +35,73 @@ export class UserService {
       try {
           const exist = await this.bdRepo.findOne({
             where: {
-              accountName: req.accountName, 
-              userId: user.id
-            }
-          });
-        
-          if(exist) {
-            return clientFeedback({
-              status: 400,
-              message: 'Account already exist'
-            })
-          }
-
-          const existAcctNo = await this.bdRepo.findOne({
-            where: {
+              accountName: req.accountName,
               accountNumber: req.accountNumber, 
               userId: user.id
             }
           });
         
-          if(existAcctNo) {
-            return clientFeedback({
-              status: 400,
-              message: 'Account Number already exist'
-            })
-          }
+          if(exist) {
+            if(exist.accountNumber != req.accountNumber) {
 
+              const payload = { 
+                type: "nuban", 
+                name: req.accountName, 
+                account_number: req.accountNumber, 
+                bank_code: req.bankCode, 
+                currency: "NGN"
+              }
+              const result = await this.httpReqSvc.createTransferRecipient(payload);
+              const {data} = result;
+              if(data && data.recipient_code) {
+                exist.recipientCode = data.recipient_code;
+              }
 
-          const mapped = plainToClass(BankDetailsEntity, req);
-          mapped.createdBy = user.email;
-          mapped.userId = user.id;
-    
-          const payload = { 
-              type: "nuban", 
-              name: req.accountName, 
-              account_number: req.accountNumber, 
-              bank_code: req.bankCode, 
-              currency: "NGN"
-          }
+              await this.bdRepo.save(exist);
 
-          const result = await this.httpReqSvc.createTransferRecipient(payload);
-          const {data} = result;
-          if(data && data.recipient_code) {
-             mapped.recipientCode = data.recipient_code;
-          }
-        
-          const saved = await this.bdRepo.save(mapped);
-
-          await this.userRepo.update(
-            {
-              id: user.id
-            },
-            {
-              bankDetailsAdded: true
+              return clientFeedback({
+                status: 200,
+                message: 'Bank account added successfully',
+                data: exist
+              })
             }
-          );
 
-          return clientFeedback({
-            status: 200,
-            message: 'Bank account added successfully',
-            data: saved
-          })
+          } else {         
+              const mapped = plainToClass(BankDetailsEntity, req);
+              mapped.createdBy = user.email;
+              mapped.userId = user.id;
+        
+              const payload = { 
+                  type: "nuban", 
+                  name: req.accountName, 
+                  account_number: req.accountNumber, 
+                  bank_code: req.bankCode, 
+                  currency: "NGN"
+              }
+
+              const result = await this.httpReqSvc.createTransferRecipient(payload);
+              const {data} = result;
+              if(data && data.recipient_code) {
+                mapped.recipientCode = data.recipient_code;
+              }
+            
+              const saved = await this.bdRepo.save(mapped);
+              await this.userRepo.update(
+                {
+                  id: user.id
+                },
+                {
+                  bankDetailsAdded: true
+                }
+              );
+    
+              return clientFeedback({
+                status: 200,
+                message: 'Bank account added successfully',
+                data: saved
+              })
+          
+          }
 
       } catch (error) {
         this.logger.log(`Something failed - ${error.message}`);
@@ -114,7 +124,7 @@ export class UserService {
       
         if(!exist) {
           return clientFeedback({
-            status: 400,
+            status: 404,
             message: 'Bank detail not found'
           })
         }
@@ -295,7 +305,7 @@ async findByUserId(id: string):Promise<UserEntity> {
       if(!us) {
         return clientFeedback({
           message:  "User not found",
-          status: 400
+          status: 404
         })
       }
   
@@ -386,17 +396,22 @@ async findByUserId(id: string):Promise<UserEntity> {
     try {
 
       const {totalsavings} = await this.savingSvc.getTotalSavings(user.id);
-      const totalWithdrawals = 0;
-      const loanEgibility = 0;
+      const {totalwithdrawals} = await await this.withdrawalRepo.createQueryBuilder("s")
+                  .where("s.userId = :userId", {userId: user.id})
+                  .andWhere("s.status = :st", {st: WithdrawalStatus.PAID})
+                  .select("SUM(s.amountToDisburse) AS totalWithdrawals")
+                  .getRawOne();
+
+      const loanEligibility = 0;
       const referralBonus = user.referralBalance;
 
       return clientFeedback( {
         status: 200,
         message: 'Dashboard stats fetched successfully',
         data: {
-          totalSavings: totalsavings || 0,
-          totalWithdrawals,
-          loanEgibility,
+          totalSavings: parseFloat(totalsavings) || 0,
+          totalWithdrawals: parseFloat(totalwithdrawals) || 0,
+          loanEligibility,
           referralBonus
         }
       })
