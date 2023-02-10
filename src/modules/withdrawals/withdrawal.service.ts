@@ -420,8 +420,74 @@ export class WithdrawalService {
           }
         }
 
+    } 
+  }
+
+  async singleTransfer(id: string, user: UserEntity): Promise<IClientReturnObject> {
+    try {
+
+      if(!user.isAdmin) {
+        return clientFeedback({
+          status: 403,
+          message: 'Access denied'
+        })
+      }
+
+      const w = await this.withRepo.findOne({where: {id}, relations: ['user']});
+
+      if(!w) {
+        return clientFeedback({
+          status: 404,
+          message: 'Not found'
+        })
+      }
+
+      if(!w.approved) {
+        return clientFeedback({
+          status: 400,
+          message: 'Withdrawal not approved yet'
+        })
+      }
+
+      if(w.status === WithdrawalStatus.PAID) {
+        return clientFeedback({
+          status: 400,
+          message: 'Withdrawal paid already.'
+        })
+      }
+
+      const bankDetails = await this.userSvc.getOneUserBankDetails(w.userId);
+      if(bankDetails) {
+        let amount = w.amountToDisburse * 100;
+        const payload = { 
+          source: "balance", 
+          amount,
+          reference: w.reference, 
+          recipient: bankDetails.recipientCode, 
+          reason: `Withdrawing ${w.amountToDisburse} for ${w.user.email}` 
+        }
+  
+        const response = await this.httpReqSvc.initiateTransfer(payload);
+        this.logger.log(response);
+        return clientFeedback({
+          status: response.status,
+          message: response.message,
+        })
+  
+      } else {
+        return clientFeedback({
+          status: 400,
+          message: 'User has not set up withdrawal account'
+        })
+      }
+      
+
+    } catch (error) {
+      return clientFeedback({
+        status: 500,
+        message: `something failed - ${error.message}`
+    }) 
     }
-    
   }
 
   async findWithdrawalByReference(reference): Promise<WithdrawalEntity> {

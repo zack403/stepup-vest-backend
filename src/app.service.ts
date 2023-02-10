@@ -67,17 +67,18 @@ export class AppService {
 
             case 'transfer.success':
               result.event = 'success';
+              this.logger.log(`transfer success - ${result.reference}`)
               await this.onTransferEvent(result, queryRunner);
               break;
 
             case 'transfer.failed':
               result.event = 'failed';
+              this.logger.log(`transfer failed - ${result.reference}`)
               await this.onTransferEvent(result, queryRunner);
               break;
 
             case 'transfer.reversed':
-              result.event = 'reversed';
-              await this.onTransferEvent(result, queryRunner);
+              this.logger.log(`transfer reversed - ${result.reference}`)
               break;
 
             default:
@@ -271,16 +272,13 @@ export class AppService {
             createdBy: user.email
           }
           await queryRunner.manager.save(TransactionEntity, data2);
-  
           this.logger.log("transaction inserted");  
+
         } else if(event === 'failed') {
 
           withdrawal.status = WithdrawalStatus.FAILED;
           await queryRunner.manager.save(WithdrawalEntity, withdrawal);
 
-        } else if (event === 'reversed') {
-          withdrawal.status = WithdrawalStatus.REVERSED;
-          await queryRunner.manager.save(WithdrawalEntity, withdrawal);
         }
                 
         if(queryRunner.isTransactionActive) {

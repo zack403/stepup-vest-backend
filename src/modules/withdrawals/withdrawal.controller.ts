@@ -6,6 +6,7 @@ import { WithdrawalService } from './withdrawal.service';
 import { UpdateWithdrawalDto } from './dto/update-withdrawal.dto';
 import { RequestWithdrawlDto } from './dto/request-withdrawal.dto';
 import { WithdrawalQuery } from './dto/withdrawal-query.dto';
+import { BulkTransferDto } from './dto/bulk-transfer.dto';
 
 @ApiTags('Withdrawal')
 @ApiBearerAuth()
@@ -88,5 +89,32 @@ export class WithdrawalController {
     const result = await this.withService.approve(id, req.user);
     res.status(result.status).json(result);
   }
+
+  @Put('/single-transfer/:withdrawalId')
+  @ApiOperation({summary: 'Initiate a single transfer'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Single Transfer successfully initiated' })
+  async singleTransfer(
+      @Res() res: Response, 
+      @Param('withdrawalId') withdrawalId: string,
+      @Req() req: any) : Promise<void> 
+  {
+    const result = await this.withService.singleTransfer(withdrawalId, req.user);
+    res.status(result.status).json(result);
+  }
+
+  // @Put('/bulk-transfer')
+  // @ApiOperation({summary: 'Initiate a bulk transfer'})
+  // @ApiResponse({ status: 400, description: 'Bad request' })
+  // @ApiResponse({ status: 201, description: 'Bulk Transfer successfully initiated' })
+  // async bulkTransfer(
+  //     @Res() res: Response, 
+  //     @Body() payload: BulkTransferDto,
+  //     @Req() req: any) : Promise<void> 
+  // {
+  //   const result = await this.withService.bulkTransfer(payload, req.user);
+  //   res.status(result.status).json(result);
+  // }
+
 
 }
