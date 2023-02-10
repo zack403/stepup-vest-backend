@@ -279,7 +279,7 @@ export class AppService {
           await queryRunner.manager.save(WithdrawalEntity, withdrawal);
 
         } else if (event === 'reversed') {
-          withdrawal.status = WithdrawalStatus.FAILED;
+          withdrawal.status = WithdrawalStatus.REVERSED;
           await queryRunner.manager.save(WithdrawalEntity, withdrawal);
         }
                 
