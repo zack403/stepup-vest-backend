@@ -2,13 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHmac } from 'crypto';
 import { DataSource, QueryRunner } from 'typeorm';
+import { SavingsEntity } from './modules/savings/savings.entity';
 import { SavingsService } from './modules/savings/savings.service';
+import { TransactionEntity } from './modules/transactions/transaction.entity';
 import { TransactionService } from './modules/transactions/transaction.service';
 import { AddCardDto } from './modules/user/dto/add-card.dto';
 import { UserService } from './modules/user/user.service';
+import { WithdrawalEntity } from './modules/withdrawals/withdrawal.entity';
+import { WithdrawalService } from './modules/withdrawals/withdrawal.service';
 import { IClientReturnObject } from './types/clientReturnObj';
 import { clientFeedback } from './utils/clientReturnfunction';
-import { ModeType, TransactionStatus } from './utils/enum';
+import { ModeType, TransactionStatus, TransactionType, WithdrawalStatus } from './utils/enum';
 import { HttpRequestService } from './utils/http-request';
 
 @Injectable()
@@ -22,6 +26,7 @@ export class AppService {
     private transSvc:  TransactionService,
     private userSvc: UserService,
     private savingsSvc: SavingsService,
+    private withdrawalSvc: WithdrawalService,
     private dataSource: DataSource) {
 
   }
@@ -41,23 +46,49 @@ export class AppService {
         await queryRunner.connect();
         await queryRunner.startTransaction();
 
-        const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`).update(JSON.stringify(req.body)).digest('hex');
+        const hash = createHmac('sha512', `${this.configService.get('PAYSTACK_SECRET')}`)
+                    .update(JSON.stringify(req.body))
+                    .digest('hex');
+        
         if (hash == req.headers['x-paystack-signature']) {
       
-        const response = req.body;
+          const response = req.body;
 
-        this.logger.log("in paystack hook")
+          this.logger.log("in paystack hook")
 
-        if (response.event === 'charge.success') {
-            const result = response.data;
+          const {event} = response;
+          
+          switch (event) {
+            
+            case 'charge.success':
+              const result = response.data;
+              await this.onChargeSuccess(result, queryRunner);
+              break;
 
-            return await this.reconcileAndSettlePayment(result, queryRunner);
-        }
+            case 'transfer.success':
+              result.event = 'success';
+              await this.onTransferEvent(result, queryRunner);
+              break;
 
-        return clientFeedback({
-          status: 200,
-          message: `Event acknowledged`
-        })
+            case 'transfer.failed':
+              result.event = 'failed';
+              await this.onTransferEvent(result, queryRunner);
+              break;
+
+            case 'transfer.reversed':
+              result.event = 'reversed';
+              await this.onTransferEvent(result, queryRunner);
+              break;
+
+            default:
+                this.logger.log("no event matched");
+              break;
+          }
+
+          return clientFeedback({
+            status: 200,
+            message: `Event acknowledged`
+          })
           
       }
 
@@ -79,7 +110,7 @@ export class AppService {
   }
 
 
-  async reconcileAndSettlePayment(payload: any, queryRunner: QueryRunner) {
+  async onChargeSuccess(payload: any, queryRunner: QueryRunner) {
     
     const transaction = await this.transSvc.findTransactionByReference(payload.reference);
     const amount = payload.amount / 100;
@@ -178,5 +209,95 @@ export class AppService {
       status: 200,
       message: `No transaction found`
     })
+  }
+
+  async onTransferEvent(payload: any, queryRunner: QueryRunner) {
+    const withdrawal = await this.withdrawalSvc.findWithdrawalByReference(payload.reference);
+    const amount = payload.amount / 100;
+    
+    this.logger.log(`on transfer event - ${payload.event}`)
+    if(withdrawal) {
+
+        if(withdrawal.status === WithdrawalStatus.COMPLETED) {
+          return clientFeedback ({ 
+            status: 200,
+            message: 'Withdrawal completed already.'
+          })
+        }
+        
+        const user = await this.userSvc.findByUserId(withdrawal.userId);
+        const {event} = payload;
+        if(event === 'success') {
+          withdrawal.status = WithdrawalStatus.COMPLETED;
+          await queryRunner.manager.save(WithdrawalEntity, withdrawal);
+          
+          //update plan balance
+          await queryRunner.manager.decrement
+                (SavingsEntity,
+                  {
+                    userId: user.id,
+                    savingsTypeId: withdrawal.savingsTypeId
+                  },
+                  'balance', parseInt(withdrawal.amountToWithdraw as any)
+                );
+  
+          //insert into transactions table
+          const today = new Date();
+          
+          const data1 = {
+            amount,
+            userId: withdrawal.userId,
+            reference: withdrawal.reference,
+            transactionDate: today,
+            transactionType: TransactionType.DEBIT,
+            status: TransactionStatus.COMPLETED,
+            description: `${withdrawal.reference} - Withdrawal made from your ${withdrawal.savingsType.name}`,
+            mode: ModeType.MANUAL,
+            savingTypeId: withdrawal.savingsTypeId,
+            createdBy: withdrawal.user.email
+          }
+          await queryRunner.manager.save(TransactionEntity, data1);
+  
+          const data2 = {
+            amount: withdrawal.amountCharged,
+            userId: withdrawal.userId,
+            reference: withdrawal.reference,
+            transactionDate: today,
+            transactionType: TransactionType.DEBIT,
+            status: TransactionStatus.COMPLETED,
+            description: `${withdrawal.percentageCharged} charging fee of your NGN${withdrawal.amountToWithdraw} Withdrawal`,
+            mode: ModeType.MANUAL,
+            savingTypeId: withdrawal.savingsTypeId,
+            createdBy: withdrawal.user.email
+          }
+          await queryRunner.manager.save(TransactionEntity, data2);
+  
+          this.logger.log("transaction inserted");  
+        } else if(event === 'failed') {
+
+          withdrawal.status = WithdrawalStatus.FAILED;
+          await queryRunner.manager.save(WithdrawalEntity, withdrawal);
+
+        } else if (event === 'reversed') {
+          withdrawal.status = WithdrawalStatus.FAILED;
+          await queryRunner.manager.save(WithdrawalEntity, withdrawal);
+        }
+                
+        if(queryRunner.isTransactionActive) {
+            await queryRunner.commitTransaction();
+        }
+
+        return clientFeedback({
+          status: 200,
+          message: `Withdrawal successful`
+        })
+
+    }
+
+    return clientFeedback({
+      status: 200,
+      message: `No transaction found`
+    })
+
   }
 }

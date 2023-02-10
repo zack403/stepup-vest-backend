@@ -29,14 +29,22 @@ export class AdminService {
                         message: 'Access denied!, contact administrator'
                     })
                 }
-    
-                const set = plainToClass(AdminSettingEntity, req);
-                set.createdBy = user.email;
+
+                const set = await this.getSetting();  
+                if(set) {
+                    set.withdrawalDay = req.withdrawalDay;
+                    set.percentageChargeOnWithdrawals = req.percentageChargeOnWithdrawals;
+                    set.referralAmount = req.referralAmount;
+                } else {
+                    const set = plainToClass(AdminSettingEntity, req);
+                    set.createdBy = user.email;
+                }
+               
     
                 await this.admSetRepo.save(set);
 
                 return clientFeedback({
-                    status: 400,
+                    status: 200,
                     message: 'Settings saved successfully'
                 })
                 

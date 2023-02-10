@@ -13,6 +13,7 @@ import { SavingsService } from '../savings/savings.service';
 import { AdminService } from '../admin/admin.service';
 import { SavingsModule } from '../savings/savings.module';
 import { AdminModule } from '../admin/admin.module';
+import { WithdrawalsModule } from '../withdrawals/withdrawal.module';
 
 @Module({
   imports: [
@@ -21,9 +22,18 @@ import { AdminModule } from '../admin/admin.module';
     UserModule,
     TransactionModule,
     SavingsModule,
-    AdminModule
+    AdminModule,
+    WithdrawalsModule
   ],
   controllers: [VerificationController],
-  providers: [VerificationService, UserService, HttpRequestService, AppService, SavingsService, AdminService, TransactionService]
+  providers: [
+    VerificationService,
+    UserService, 
+    HttpRequestService, 
+    AppService, 
+    SavingsService, 
+    AdminService, 
+    TransactionService
+  ]
 })
 export class VerificationModule {}

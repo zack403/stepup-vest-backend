@@ -41,7 +41,7 @@ export class SeedsService implements OnModuleInit {
             referralCode: 'roll_world',
             password: 'School_5556',
             isAdmin: true,
-            createdBy: 'Rollwordmagazine@gmail.com'
+            createdBy: 'info.rollworldmag@gmail.com'
         }
 
         user.password = await hashPassword(user.password);
@@ -57,8 +57,9 @@ export class SeedsService implements OnModuleInit {
     async saveAdminSetting () {
         const payload = {
             referralAmount: 1000,
-            percentageChargeOnSavings: 3.335,
-            createdBy: 'admin'
+            percentageChargeOnWithdrawals: 3.335,
+            withdrawalDay: 28,
+            createdBy: 'info.rollworldmag@gmail.com'
         }
 
         if(await this.adminSvc.checkSetting()) return;
