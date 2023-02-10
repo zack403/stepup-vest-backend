@@ -4,7 +4,9 @@ import { plainToClass, plainToClassFromExist } from 'class-transformer';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
 import { TransactionStatus } from 'src/utils/enum';
+import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
+import { HttpRequestService } from 'src/utils/http-request';
 import { Brackets, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
 import { SavingsService } from '../savings/savings.service';
@@ -25,6 +27,7 @@ export class WithdrawalService {
         private admSvc: AdminService,
         private userSvc: UserService,
         private savingSvc: SavingsService,
+        private httpReqSvc: HttpRequestService,
         @InjectRepository(WithdrawalEntity) private withRepo: Repository<WithdrawalEntity>
     ) {}
 
@@ -365,7 +368,7 @@ export class WithdrawalService {
     
         withdrawal.approved = true;
         withdrawal.approvedBy = user.email;
-        withdrawal.reference = generateUniqueCode();
+        withdrawal.reference = generatePaymentRef();
     
         const updated = await this.withRepo.save(withdrawal);
     
@@ -383,6 +386,48 @@ export class WithdrawalService {
     }
   }
 
+  async initiateTransfer(): Promise<any> {
+    const set = await this.admSvc.getSetting();
+    const today = new Date();
+
+    if(set.withdrawalDay === today.getDate()) {
+
+        this.logger.log("initiating transfer");
+        const result = await this.withRepo.createQueryBuilder("w")
+        .where("w.approved = :app", {app: true})
+        .andWhere(new Brackets(qb => {
+          qb.where("w.status = :st", {st: TransactionStatus.PENDING})
+          .orWhere("w.status = :s", {s: TransactionStatus.FAILED})
+        })).getMany();
+
+        if(result.length > 0) {
+          for (const r of result) {
+            const bankDetails = await this.userSvc.getOneUserBankDetails(r.userId);
+             if(bankDetails) {
+
+              let amount = r.amountToDisburse * 100;
+              const payload = { 
+                source: "balance", 
+                amount,
+                reference: generateUniqueCode(), 
+                recipient: bankDetails.recipientCode, 
+                reason:  `Withdrawing ${r.amountToDisburse} for user` 
+              }
+
+              const response = await this.httpReqSvc.initiateTransfer(payload);
+              this.logger.log(response);
+             }
+          }
+        }
+
+    }
+    
+  }
+
+  async findWithdrawalByReference(reference): Promise<WithdrawalEntity> {
+    return await this.withRepo.findOne({where: {reference}});
+}
+
   async canWithdrawNow(userId: string): Promise<boolean> {
       const result = await this.withRepo.createQueryBuilder("w")
       .where("w.userId = :userId", {userId})
@@ -393,9 +438,9 @@ export class WithdrawalService {
       })).getOne();
 
       if(result) {
-         return true;
+         return false;
       }
 
-      return false;
+      return true;
   }
 }

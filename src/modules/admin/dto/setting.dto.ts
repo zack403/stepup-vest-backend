@@ -10,5 +10,9 @@ export class AdminSettingsDto {
     @ApiProperty()  
     @IsNotEmpty()
     percentageChargeOnWithdrawals: number;
+
+    @ApiProperty()  
+    @IsNotEmpty()
+    withdrawalDay: number;
         
 }

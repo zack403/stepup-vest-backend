@@ -13,3 +13,10 @@ export enum TransactionType {
     CREDIT = 'credit',
     DEBIT = 'debit'
 }
+
+export enum WithdrawalStatus {
+    PENDING = 'pending',
+    FAILED = 'failed',
+    COMPLETED = 'completed',
+    REVERSED = 'reversed'
+}

@@ -130,7 +130,7 @@ export class VerificationService {
     
           if (data.status === "success") {
   
-            return await this.appSvc.reconcileAndSettlePayment(data, queryRunner);
+            return await this.appSvc.onChargeSuccess(data, queryRunner);
     
           }
         }
