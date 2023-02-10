@@ -132,10 +132,10 @@ export function ConfirmEmail(user: UserEntity, link): string {
                     <td>
                       
                       <p style="margin-top: 4px">
-                      Office: Kazeem House, 3 Adeniji Close, off Kunle street, Shagamu, Lagos. <br>
-                      Phone: 0900 745 622 255 (Mon-Fri from 9am-5pm) <br>
-                      Email: contact@stepupvest.com <br>
-                      StepupVest, © 2022 - 2023 STEPUPTECH GLOBAL LIMITED - RC 100020
+                      Office: Suite 4, Kingsley Plaza, Taiwo Kein Fasuba, Governor's Rd, Ikotun 100211, Lagos. <br>
+                      Phone: 08034433125 (Mon-Fri from 9am-5pm) <br>
+                      Email: info.rollworldmag@gmail.com <br>
+                      StepupVest, © 2023
                         
                       </p>
                     </td>
