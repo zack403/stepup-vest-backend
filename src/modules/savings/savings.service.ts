@@ -34,7 +34,7 @@ export class SavingsService {
         const stype = await this.adminSvc.getSavingsTypeBySlug(slug);
         if(!stype) {
           return clientFeedback( {
-            status: 400,
+            status: 404,
             message: 'not found'
           })
         }
