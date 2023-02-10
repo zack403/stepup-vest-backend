@@ -17,6 +17,6 @@ export enum TransactionType {
 export enum WithdrawalStatus {
     PENDING = 'pending',
     FAILED = 'failed',
-    COMPLETED = 'completed',
+    PAID = 'paid',
     REVERSED = 'reversed'
 }

@@ -218,17 +218,17 @@ export class AppService {
     this.logger.log(`on transfer event - ${payload.event}`)
     if(withdrawal) {
 
-        if(withdrawal.status === WithdrawalStatus.COMPLETED) {
+        if(withdrawal.status === WithdrawalStatus.PAID) {
           return clientFeedback ({ 
             status: 200,
             message: 'Withdrawal completed already.'
           })
         }
         
-        const user = await this.userSvc.findByUserId(withdrawal.userId);
+        const user = withdrawal.user;
         const {event} = payload;
         if(event === 'success') {
-          withdrawal.status = WithdrawalStatus.COMPLETED;
+          withdrawal.status = WithdrawalStatus.PAID;
           await queryRunner.manager.save(WithdrawalEntity, withdrawal);
           
           //update plan balance
@@ -254,7 +254,7 @@ export class AppService {
             description: `${withdrawal.reference} - Withdrawal made from your ${withdrawal.savingsType.name}`,
             mode: ModeType.MANUAL,
             savingTypeId: withdrawal.savingsTypeId,
-            createdBy: withdrawal.user.email
+            createdBy: user.email
           }
           await queryRunner.manager.save(TransactionEntity, data1);
   
@@ -268,7 +268,7 @@ export class AppService {
             description: `${withdrawal.percentageCharged} charging fee of your NGN${withdrawal.amountToWithdraw} Withdrawal`,
             mode: ModeType.MANUAL,
             savingTypeId: withdrawal.savingsTypeId,
-            createdBy: withdrawal.user.email
+            createdBy: user.email
           }
           await queryRunner.manager.save(TransactionEntity, data2);
   
