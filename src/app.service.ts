@@ -57,17 +57,17 @@ export class AppService {
           this.logger.log("in paystack hook")
 
           const {event} = response;
-          
+          const result = response.data;
+
           switch (event) {
             
             case 'charge.success':
-              const result = response.data;
               await this.onChargeSuccess(result, queryRunner);
               break;
 
             case 'transfer.success':
               result.event = 'success';
-              this.logger.log(`transfer success - ${result.reference}`)
+              this.logger.log(`transfer success - ${result}`)
               await this.onTransferEvent(result, queryRunner);
               break;
 
