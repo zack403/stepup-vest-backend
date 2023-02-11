@@ -101,7 +101,7 @@ export class TransactionService {
 
                 const [items, count] = await this.transRepo.findAndCount( {
                     where: {userId: user.id, transactionType},
-                    order: {transactionDate : 'DESC'},
+                    order: {createdAt : 'DESC'},
                     take: limit,
                     skip: page ? limit * (page - 1) : 0
                 })
@@ -113,7 +113,7 @@ export class TransactionService {
                 
                 const [items, count] = await this.transRepo.findAndCount( {
                     where: {userId: user.id},
-                    order: {transactionDate : 'DESC'},
+                    order: {createdAt : 'DESC'},
                     take: limit,
                     skip: page ? limit * (page - 1) : 0
                 })

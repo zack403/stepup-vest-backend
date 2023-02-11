@@ -5,6 +5,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AddBankDetailsDto } from './dto/add-bank-details.dto';
+import { UpdateUserSettingDto } from './dto/update-setting.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -89,6 +90,14 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Return user successfully updated' })
   async update(@Res() res: Response, @Body() updateUserDto: UpdateUserDto, @Req() req: any) {
     const result = await this.userService.update(updateUserDto, req.user);
+    res.status(result.status).json(result);
+  }
+
+  @Put('setting')
+  @ApiOperation({ summary: 'Update a user setting' })
+  @ApiResponse({ status: 200, description: 'Return user setting successfully updated' })
+  async updateSetting(@Res() res: Response, @Body() payload: UpdateUserSettingDto, @Req() req: any) {
+    const result = await this.userService.updateSetting(payload, req.user);
     res.status(result.status).json(result);
   }
 

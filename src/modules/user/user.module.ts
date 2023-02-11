@@ -16,6 +16,7 @@ import { TransactionEntity } from '../transactions/transaction.entity';
 import { HttpRequestService } from 'src/utils/http-request';
 import { HttpModule } from '@nestjs/axios';
 import { WithdrawalEntity } from '../withdrawals/withdrawal.entity';
+import { UserSettingEntity } from './entities/setting.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { WithdrawalEntity } from '../withdrawals/withdrawal.entity';
       SavingsTypeEntity,
       AdminSettingEntity,
       TransactionEntity,
-      WithdrawalEntity
+      WithdrawalEntity,
+      UserSettingEntity
     ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     HttpModule
