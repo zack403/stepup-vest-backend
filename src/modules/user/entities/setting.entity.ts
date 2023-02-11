@@ -26,6 +26,9 @@ export class UserSettingEntity extends AbstractBaseEntity {
   @Column('uuid')
   cardId: string;
 
+  @Column({type: "int"})
+  dayOfMonth: number;
+
   @Column({type: "enum", enum: WhenToStartSaving, default: WhenToStartSaving.NOW})
   whenToStart: WhenToStartSaving;
 
