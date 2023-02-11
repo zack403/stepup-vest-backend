@@ -59,6 +59,7 @@ export class SeedsService implements OnModuleInit {
             referralAmount: 1000,
             percentageChargeOnWithdrawals: 3.335,
             withdrawalDay: 28,
+            referralBonusClaimLimit: 5000,
             createdBy: 'info.rollworldmag@gmail.com'
         }
 

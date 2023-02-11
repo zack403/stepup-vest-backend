@@ -70,6 +70,9 @@ export class UserEntity extends AbstractBaseEntity {
 
   @Column({type: "numeric", default: 0, precision: 10, scale: 2})
   referralBalance: number;
+  
+  @Column({type: 'bool', default: false })
+  referredBySettled: boolean;
 
   @AfterLoad()
   toNumber() {

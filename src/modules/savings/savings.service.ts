@@ -9,6 +9,7 @@ import { AdminService } from '../admin/admin.service';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
 import { TransactionService } from '../transactions/transaction.service';
 import { UserEntity } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 import { SavingsEntity } from './savings.entity';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class SavingsService {
 
   constructor(
     private adminSvc: AdminService,
+    @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
     private readonly transSvc: TransactionService,
     @InjectRepository(SavingsEntity) private saveRepo: Repository<SavingsEntity>
     ) {}
@@ -102,6 +104,14 @@ export class SavingsService {
 
           const saved = await this.transSvc.saveTrans(data);
 
+          if(user.referredBy) {
+            if(!user.referredBySettled) {
+
+            }
+          }
+
+          await this.checkIfReferralCanClaimBonus(user);
+
           return clientFeedback({
               status: 200,
               message: 'Quick safe reference generated successfully',
@@ -152,8 +162,42 @@ export class SavingsService {
 
           await queryRunner.manager.save(SavingsEntity, saving);
         }
-
     }
+
+    async checkIfReferralCanClaimBonus(user: UserEntity) {
+        
+      if(!user.referredBySettled) {
+          
+          if(user.referredBy) {
+              
+              const myReferrer = await this.userRepo.findOne({
+                where: [
+                  { referralCode: user.referredBy},
+                  { phoneNumber: user.referredBy},
+                ]
+              });
+
+              if(myReferrer) {
+                  //check if user is eligible to claim referral bonus
+                  const {totalsavings} = await this.getTotalSavings(user.id);
+                  const setting = await this.adminSvc.getSetting();
+
+                  if(parseInt(totalsavings) >= setting.referralBonusClaimLimit) {
+
+                    
+                    await this.userRepo.increment(
+                      {
+                        id: myReferrer.id
+                      },
+                      'referralBalance', setting.referralAmount
+                    ); 
+                  }
+              }
+              
+          }
+        }
+    }
+
 
   }
 
