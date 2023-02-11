@@ -468,7 +468,7 @@ async findByUserId(id: string):Promise<UserEntity> {
         }
 
         const set = await this.userSetRepo.findOne({where: {userId: user.id}});
-        
+        let saved;
         if(set) {
 
           set.autoSave = payload.autoSave;
@@ -487,12 +487,13 @@ async findByUserId(id: string):Promise<UserEntity> {
           newSet.createdBy = user.email;
           newSet.userId = user.id;
 
-          await this.userSetRepo.save(newSet);
+          saved = await this.userSetRepo.save(newSet);
         }
 
         return clientFeedback({
           status: 200,
-          message: 'Setting saved successfully'
+          message: 'Setting saved successfully',
+          data: saved ? saved : set
         })
         
       } catch (error) {
@@ -501,6 +502,17 @@ async findByUserId(id: string):Promise<UserEntity> {
           message: `something failed - ${error.message}`
         })
       }
+  }
+
+  async getSetting(user: UserEntity): Promise<IClientReturnObject> {
+      
+     const setting = await this.userSetRepo.findOne({where: {userId: user.id}});
+
+      return clientFeedback({
+        status: 200,
+        message: 'Fetched successfully',
+        data: setting
+      })
   }
 
   async userHasBankAccount(userId: string): Promise<boolean> {

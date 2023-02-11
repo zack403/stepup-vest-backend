@@ -58,6 +58,14 @@ export class UserController {
     res.status(result.status).json(result);
   }
 
+  @Get('setting')
+  @ApiOperation({ summary: 'Get my setting'})
+  @ApiResponse({ status: 200, description: 'Return my setting'})
+  async getSetting(@Res() res: Response,  @Req() req: any): Promise<void> {
+    const result = await this.userService.getSetting(req.user);
+    res.status(result.status).json(result);
+  }
+
   @Delete('card/:cardId')
   @ApiOperation({ summary: 'remove a card'})
   @ApiResponse({ status: 200, description: 'Remove card'})
