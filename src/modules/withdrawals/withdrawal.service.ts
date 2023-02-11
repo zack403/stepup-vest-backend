@@ -49,6 +49,13 @@ export class WithdrawalService {
             })
           }
 
+          if(await this.alreadyWithdrawInCurrentMonth(user.id)) {
+            return clientFeedback({
+              status: 400,
+              message: 'You can only withdraw one time in a month.'
+            })
+          }
+
           if(!await this.userSvc.userHasBankAccount(user.id)) {
             return clientFeedback({
                 status: 400,
@@ -508,5 +515,33 @@ export class WithdrawalService {
       }
 
       return false;
+  }
+
+  async alreadyWithdrawInCurrentMonth(userId) {
+      const latestWithdrawal = await this.withRepo.createQueryBuilder("w")
+      .where("w.userId = :userId", {userId})
+      .andWhere("w.status = :st", {st: WithdrawalStatus.PAID})
+      .orderBy("w.createdAt", "DESC")
+      .getOne();
+
+      if(!latestWithdrawal) {
+        return false;
+      }
+
+      const lastWithdrawalYear = new Date(latestWithdrawal.createdAt).getFullYear();
+      const currentYear = new Date().getFullYear();
+      const lastWithdrawalMonth = new Date(latestWithdrawal.createdAt).getMonth();
+      const currentMonth = new Date().getMonth();  
+
+      if(lastWithdrawalYear === currentYear) {
+        if(lastWithdrawalMonth === currentMonth) {
+          return true;
+        }
+        return false;
+      } else {
+        return false;
+      }
+      
+    
   }
 }

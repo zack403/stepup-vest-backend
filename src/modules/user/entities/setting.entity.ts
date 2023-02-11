@@ -29,6 +29,9 @@ export class UserSettingEntity extends AbstractBaseEntity {
   @Column({type: "enum", enum: WhenToStartSaving, default: WhenToStartSaving.NOW})
   whenToStart: WhenToStartSaving;
 
+  @Column({ type: 'date', nullable: true})
+  nextSaveDate: Date; 
+
 
 }
 
