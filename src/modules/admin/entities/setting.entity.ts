@@ -13,7 +13,7 @@ export class AdminSettingEntity extends AbstractBaseEntity {
   @Column({type: "int", default: 28}) // the day of the month a user can withdraw
   withdrawalDay: number;
 
-  @Column({type: "numeric", default: 3.335}) // in percentage
+  @Column({type: "numeric", default: 5000})
   referralBonusClaimLimit: number;
 
 
@@ -21,6 +21,7 @@ export class AdminSettingEntity extends AbstractBaseEntity {
   toNumber() {
       this.referralAmount = parseFloat(this.referralAmount as any);
       this.percentageChargeOnWithdrawals = parseFloat(this.percentageChargeOnWithdrawals as any);
+      this.referralBonusClaimLimit = parseFloat(this.referralBonusClaimLimit as any);
   }
   
 }

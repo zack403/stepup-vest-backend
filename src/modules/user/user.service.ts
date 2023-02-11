@@ -13,9 +13,11 @@ import { WithdrawalEntity } from '../withdrawals/withdrawal.entity';
 import { WithdrawalService } from '../withdrawals/withdrawal.service';
 import { AddBankDetailsDto } from './dto/add-bank-details.dto';
 import { AddCardDto } from './dto/add-card.dto';
+import { UpdateUserSettingDto } from './dto/update-setting.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BankDetailsEntity } from './entities/bank-details.entity';
 import { CardEntity } from './entities/card.entity';
+import { UserSettingEntity } from './entities/setting.entity';
 import { UserEntity } from './entities/user.entity';
 
 @Injectable()
@@ -29,7 +31,10 @@ export class UserService {
     private savingSvc: SavingsService,
     @InjectRepository(WithdrawalEntity) private readonly withdrawalRepo: Repository<WithdrawalEntity>,
     private httpReqSvc: HttpRequestService,
-    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>) {}
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(UserSettingEntity) private userSetRepo: Repository<UserSettingEntity>,
+
+    ) {}
 
   async addBankDetails(req: AddBankDetailsDto, user: UserEntity): Promise<IClientReturnObject> {
       try {
@@ -448,8 +453,54 @@ async findByUserId(id: string):Promise<UserEntity> {
         status: 500,
         message: 'something failed'
       })
-    }
+    }     
+  }
+
+  async updateSetting(payload: UpdateUserSettingDto, user: UserEntity): Promise<IClientReturnObject> {
+      try {
+
+        const card = await this.cardRepo.findOne({where: {userId: user.id, id: payload.cardId}});
+        if(!card) {
+          return clientFeedback({
+            status: 400,
+            message: 'Invalid request'
+          })
+        }
+
+        const set = await this.userSetRepo.findOne({where: {userId: user.id}});
         
+        if(set) {
+
+          set.autoSave = payload.autoSave;
+          set.frequency = payload.frequency;
+          set.amount = payload.amount;
+          set.cardId = payload.cardId;
+          set.dayToSave = payload.dayToSave;
+          set.timeToSave = payload.timeToSave;
+          set.whenToStart = payload.whenToStart;
+
+          await this.userSetRepo.save(set);
+
+        } else {
+          
+          const newSet = plainToClass(UserSettingEntity, payload);
+          newSet.createdBy = user.email;
+          newSet.userId = user.id;
+
+          await this.userSetRepo.save(newSet);
+        }
+
+        return clientFeedback({
+          status: 200,
+          message: 'Setting saved successfully'
+        })
+        
+      } catch (error) {
+        return clientFeedback({
+          status: 500,
+          message: `something failed - ${error.message}`
+        })
+      }
   }
 
   async userHasBankAccount(userId: string): Promise<boolean> {
