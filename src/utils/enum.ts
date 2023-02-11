@@ -24,8 +24,7 @@ export enum WithdrawalStatus {
 export enum SavingsFrequency {
     DAILY = 'daily',
     WEEKLY = 'weekly',
-    MOTHLY = 'monthly',
-    ANYTIME = 'anytime/manual'
+    MOTHLY = 'monthly'
 }
 
 export enum SavingsDayOfTheWeek {

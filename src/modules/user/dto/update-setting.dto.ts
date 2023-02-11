@@ -38,6 +38,11 @@ export class UpdateUserSettingDto {
     @IsUUID()
     cardId: string;
 
+    @ApiProperty({default: 1})  
+    @IsNotEmpty()
+    @IsNumber()
+    dayOfMonth: number;
+
     @ApiProperty({enum: WhenToStartSaving})
     @IsString()
     @IsNotEmpty()
