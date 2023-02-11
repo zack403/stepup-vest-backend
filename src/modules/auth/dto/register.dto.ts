@@ -57,6 +57,6 @@ export class RegisterDto {
     @ApiProperty()
     @IsOptional()
     @ApiPropertyOptional()
-    referralCode: string;
+    referredBy: string;
         
 }

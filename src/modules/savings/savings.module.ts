@@ -9,11 +9,13 @@ import { AdminService } from '../admin/admin.service';
 import { AdminModule } from '../admin/admin.module';
 import { TransactionService } from '../transactions/transaction.service';
 import { TransactionModule } from '../transactions/transaction.module';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       SavingsEntity,
+      UserEntity
     ]),
     HttpModule,
     AuthModule,

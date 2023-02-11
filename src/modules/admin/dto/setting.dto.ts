@@ -14,5 +14,9 @@ export class AdminSettingsDto {
     @ApiProperty()  
     @IsNotEmpty()
     withdrawalDay: number;
+
+    @ApiProperty()  
+    @IsNotEmpty()
+    referralBonusClaimLimit: number
         
 }
