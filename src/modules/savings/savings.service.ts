@@ -192,6 +192,15 @@ export class SavingsService {
                       },
                       'referralBalance', setting.referralAmount
                     ); 
+
+                    await this.userRepo.update(
+                      {
+                        id: user.id
+                      },
+                      {
+                        referredBySettled: true
+                      }
+                    ); 
                   }
               }
               

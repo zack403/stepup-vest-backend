@@ -42,13 +42,6 @@ export class WithdrawalService {
             })
           }
 
-          // if(!await this.canWithdrawNow(user.id)) {
-          //   return clientFeedback({
-          //     status: 400,
-          //     message: 'You cannot carry out this transaction as you have a pending one.'
-          //   })
-          // }
-
           if(await this.alreadyWithdrawInCurrentMonth(user.id)) {
             return clientFeedback({
               status: 400,
@@ -92,6 +85,11 @@ export class WithdrawalService {
           data.amountToDisburse = amountToDisburse;
 
           const saved = await this.withRepo.save(data);
+          const now = new Date();
+
+          if(now.getDate() === setting.withdrawalDay) {
+             await this.approve(saved.id, user);
+          }
 
           return clientFeedback({
             status: 200,
@@ -501,22 +499,7 @@ export class WithdrawalService {
     return await this.withRepo.findOne({where: {reference}, relations: ['user', 'savingsType']});
   }
 
-  async canWithdrawNow(userId: string): Promise<boolean> {
-      const result = await this.withRepo.createQueryBuilder("w")
-      .where("w.userId = :userId", {userId})
-      .andWhere("w.approved = :app", {app: true})
-      .andWhere(new Brackets(qb => {
-         qb.where("w.status = :st", {st: WithdrawalStatus.PAID})
-         .orWhere("w.status = :s", {s: WithdrawalStatus.FAILED})
-      })).getOne();
-
-      if(result) {
-         return true;
-      }
-
-      return false;
-  }
-
+  
   async alreadyWithdrawInCurrentMonth(userId) {
       const latestWithdrawal = await this.withRepo.createQueryBuilder("w")
       .where("w.userId = :userId", {userId})
