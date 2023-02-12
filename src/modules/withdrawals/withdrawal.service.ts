@@ -42,12 +42,12 @@ export class WithdrawalService {
             })
           }
 
-          if(!await this.canWithdrawNow(user.id)) {
-            return clientFeedback({
-              status: 400,
-              message: 'You cannot carry out this transaction as you have a pending one.'
-            })
-          }
+          // if(!await this.canWithdrawNow(user.id)) {
+          //   return clientFeedback({
+          //     status: 400,
+          //     message: 'You cannot carry out this transaction as you have a pending one.'
+          //   })
+          // }
 
           if(await this.alreadyWithdrawInCurrentMonth(user.id)) {
             return clientFeedback({
