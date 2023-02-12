@@ -1,15 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
+import { addDaysToCurrentDate } from 'src/utils/add-days-to-date';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { ModeType, TransactionStatus, TransactionType } from 'src/utils/enum';
+import { ModeType, SavingsFrequency, TransactionStatus, TransactionType } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
+import { HttpRequestService } from 'src/utils/http-request';
 import { QueryRunner, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
+import { TransactionEntity } from '../transactions/transaction.entity';
 import { TransactionService } from '../transactions/transaction.service';
+import { CardEntity } from '../user/entities/card.entity';
+import { UserSettingEntity } from '../user/entities/setting.entity';
 import { UserEntity } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
 import { SavingsEntity } from './savings.entity';
 
 @Injectable()
@@ -20,7 +24,10 @@ export class SavingsService {
   constructor(
     private adminSvc: AdminService,
     @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(UserSettingEntity) private readonly userSetRepo: Repository<UserSettingEntity>,
+    @InjectRepository(CardEntity) private readonly cardRepo: Repository<CardEntity>,
     private readonly transSvc: TransactionService,
+    private readonly httpReqSvc: HttpRequestService,
     @InjectRepository(SavingsEntity) private saveRepo: Repository<SavingsEntity>
     ) {}
 
@@ -103,12 +110,6 @@ export class SavingsService {
           }
 
           const saved = await this.transSvc.saveTrans(data);
-
-          if(user.referredBy) {
-            if(!user.referredBySettled) {
-
-            }
-          }
 
           await this.checkIfReferralCanClaimBonus(user);
 
@@ -196,6 +197,81 @@ export class SavingsService {
               
           }
         }
+    }
+
+
+    async runAutoSave(queryRunner: QueryRunner) {
+        
+       const usersInAutoSave = await this.userSetRepo.createQueryBuilder("s")
+         .where('s.nextSaveDate = CURRENT_DATE AND s.autoSave = true')
+         .leftJoinAndSelect("s.user", "user")
+         .getMany();  
+         
+         let savingType = await this.adminSvc.getStepUpSavingsType();
+
+         for (const s of usersInAutoSave) {
+            const card = await this.cardRepo.findOne({where: {id: s.cardId, userId: s.userId, reusable: true}});
+            
+            if(card) {
+              const p = { 
+                authorization_code : card.authorizatioCode, 
+                email: s.user.email, 
+                amount: s.amount * 100 
+              }
+
+              const {data} = await this.httpReqSvc.recurringCharge(p);
+
+              if(data.status === 'success') {
+                
+                let amount = data.amount / 100;
+                const tr = {
+                   userId: s.userId,
+                   amount,
+                   reference: data.reference,
+                   transactionDate: data.transaction_date,
+                   transactionType: TransactionType.CREDIT,
+                   status: TransactionStatus.COMPLETED,    
+                   description: `${data.reference} - Auto save of ${amount} into ${savingType.name}`,
+                   mode: ModeType.MANUAL,
+                   savingTypeId: savingType.id,
+                   createdBy: s.user.email
+                }
+
+                await queryRunner.manager.save(TransactionEntity, tr);
+
+                await this.updateOrSaveSavings(s.user, amount, queryRunner, savingType.id);
+
+                let newDate;
+                switch (s.frequency) {
+                    case SavingsFrequency.DAILY: {
+                        newDate = addDaysToCurrentDate(1)
+                        s.nextSaveDate = newDate;
+                        break;
+                    }
+                    case SavingsFrequency.WEEKLY: {
+                        newDate = addDaysToCurrentDate(7)
+                        s.nextSaveDate = newDate;
+                        break;
+                    }
+                    case SavingsFrequency.MONTHLY: {
+                        newDate = addDaysToCurrentDate(30)
+                        s.nextSaveDate = newDate;
+                        break;
+                    }
+                    default:
+                        this.logger.log("nothing");
+                }
+
+                await queryRunner.manager.save(UserSettingEntity, s);
+                
+              }
+
+            }
+         }
+
+         if(queryRunner.isTransactionActive) {
+          await queryRunner.commitTransaction();
+         }
     }
 
 

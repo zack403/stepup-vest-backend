@@ -1,6 +1,7 @@
 import { SavingsDayOfTheWeek, SavingsFrequency, TimeToSave, WhenToStartSaving } from 'src/utils/enum';
-import {  Column, Entity } from 'typeorm';
+import {  Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
+import { UserEntity } from './user.entity';
 
 @Entity('UserSetting')
 export class UserSettingEntity extends AbstractBaseEntity {
@@ -33,7 +34,10 @@ export class UserSettingEntity extends AbstractBaseEntity {
   whenToStart: WhenToStartSaving;
 
   @Column({ type: 'date', nullable: true})
-  nextSaveDate: Date; 
+  nextSaveDate: Date;
+  
+  @ManyToOne(() => UserEntity)
+  user: UserEntity;
 
 
 }

@@ -10,12 +10,17 @@ import { AdminModule } from '../admin/admin.module';
 import { TransactionService } from '../transactions/transaction.service';
 import { TransactionModule } from '../transactions/transaction.module';
 import { UserEntity } from '../user/entities/user.entity';
+import { UserSettingEntity } from '../user/entities/setting.entity';
+import { CardEntity } from '../user/entities/card.entity';
+import { HttpRequestService } from 'src/utils/http-request';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       SavingsEntity,
-      UserEntity
+      UserEntity,
+      UserSettingEntity,
+      CardEntity
     ]),
     HttpModule,
     AuthModule,
@@ -23,7 +28,7 @@ import { UserEntity } from '../user/entities/user.entity';
     TransactionModule
   ],
   controllers: [SavingsController],
-  providers: [SavingsService, AdminService, TransactionService],
+  providers: [SavingsService, AdminService, TransactionService, HttpRequestService],
   exports: [TypeOrmModule, SavingsService]
 })
 export class SavingsModule {}
