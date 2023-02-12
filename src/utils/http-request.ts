@@ -155,4 +155,29 @@ export class HttpRequestService {
     }
   }
 
+  async recurringCharge(payload: any): Promise<any> {
+    try {
+      const result = await lastValueFrom(this.httpService.post(
+          `${this.configSvc.get("PAYSTACK_BASE_URL")}transaction/charge_authorization`, 
+          payload,
+          this.payStackRequestHeaders
+        ).pipe(map(r => r.data)));
+
+        if(result.status) {
+      
+          return result;  
+        }
+
+        return result;
+      
+    } catch (error) {
+        this.logger.log(`error in paystack recurring charge - ${error} - ${error.message}`)
+        return clientFeedback({
+            message:  `Something failed, ${error.response.data.message}`,
+            status: 500,
+            trace: error
+        })
+    }
+  }
+
 }
