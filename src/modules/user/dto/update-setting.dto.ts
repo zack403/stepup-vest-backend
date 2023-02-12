@@ -1,5 +1,5 @@
-import { ApiProperty} from "@nestjs/swagger";
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, min, minLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional} from "@nestjs/swagger";
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, min, minLength } from "class-validator";
 import { SavingsDayOfTheWeek, SavingsFrequency, TimeToSave, WhenToStartSaving } from "src/utils/enum";
 
 export class UpdateUserSettingDto {
@@ -21,9 +21,8 @@ export class UpdateUserSettingDto {
     @IsNotEmpty()
     amount: number;
 
-    @ApiProperty({enum: SavingsDayOfTheWeek})
-    @IsNotEmpty()
-    @IsEnum(SavingsDayOfTheWeek)
+    @ApiPropertyOptional({enum: SavingsDayOfTheWeek})
+    @IsOptional()
     dayToSave: SavingsDayOfTheWeek;
 
     @ApiProperty({enum: TimeToSave})
@@ -38,9 +37,8 @@ export class UpdateUserSettingDto {
     @IsUUID()
     cardId: string;
 
-    @ApiProperty({default: 1})  
-    @IsNotEmpty()
-    @IsNumber()
+    @ApiPropertyOptional({default: 1})  
+    @IsOptional()
     dayOfMonth: number;
 
     @ApiProperty({enum: WhenToStartSaving})

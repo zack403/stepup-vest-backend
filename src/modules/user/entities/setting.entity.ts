@@ -17,7 +17,7 @@ export class UserSettingEntity extends AbstractBaseEntity {
   @Column({type: "numeric", default: 0, precision: 10, scale: 2})
   amount: number;
   
-  @Column({type: "enum", enum: SavingsDayOfTheWeek, default: SavingsDayOfTheWeek.MONDAYS})
+  @Column({type: "enum", enum: SavingsDayOfTheWeek, nullable: true})
   dayToSave: SavingsDayOfTheWeek;
   
   @Column({type: "enum", enum: TimeToSave, default: TimeToSave.FOUR_00_AM})
@@ -26,7 +26,7 @@ export class UserSettingEntity extends AbstractBaseEntity {
   @Column('uuid')
   cardId: string;
 
-  @Column({type: "int"})
+  @Column({type: "int", nullable: true})
   dayOfMonth: number;
 
   @Column({type: "enum", enum: WhenToStartSaving, default: WhenToStartSaving.NOW})
