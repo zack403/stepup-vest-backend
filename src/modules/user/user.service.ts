@@ -109,6 +109,11 @@ export class UserService {
           
           }
 
+          return clientFeedback({
+            status: 200,
+            message: 'Operation successful'
+          })
+
       } catch (error) {
         this.logger.log(`Something failed - ${error.message}`);
         return clientFeedback({
