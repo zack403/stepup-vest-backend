@@ -475,7 +475,8 @@ async findByUserId(id: string):Promise<UserEntity> {
           set.frequency = payload.frequency;
           set.amount = payload.amount;
           set.cardId = payload.cardId;
-          set.dayToSave = payload.dayToSave;
+          set.dayToSave = payload.dayToSave ? payload.dayToSave : null;
+          set.dayOfMonth = payload.dayOfMonth ? payload.dayOfMonth : null;
           set.timeToSave = payload.timeToSave;
           set.whenToStart = payload.whenToStart;
 
@@ -486,6 +487,9 @@ async findByUserId(id: string):Promise<UserEntity> {
           const newSet = plainToClass(UserSettingEntity, payload);
           newSet.createdBy = user.email;
           newSet.userId = user.id;
+
+          if(!newSet.dayToSave) newSet.dayToSave = null;
+          if(!newSet.dayOfMonth) newSet.dayOfMonth = null;
 
           saved = await this.userSetRepo.save(newSet);
         }
