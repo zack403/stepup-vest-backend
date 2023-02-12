@@ -221,51 +221,54 @@ export class SavingsService {
 
               const {data} = await this.httpReqSvc.recurringCharge(p);
 
-              if(data.status === 'success') {
+              if(data) {
+                if(data.status === 'success') {
                 
-                let amount = data.amount / 100;
-                const tr = {
-                   userId: s.userId,
-                   amount,
-                   reference: data.reference,
-                   transactionDate: data.transaction_date,
-                   transactionType: TransactionType.CREDIT,
-                   status: TransactionStatus.COMPLETED,    
-                   description: `${data.reference} - Auto save of ${amount} into ${savingType.name}`,
-                   mode: ModeType.MANUAL,
-                   savingTypeId: savingType.id,
-                   createdBy: s.user.email
+                  let amount = data.amount / 100;
+                  const tr = {
+                     userId: s.userId,
+                     amount,
+                     reference: data.reference,
+                     transactionDate: data.transaction_date,
+                     transactionType: TransactionType.CREDIT,
+                     status: TransactionStatus.COMPLETED,    
+                     description: `${data.reference} - Auto save of ${amount} into ${savingType.name}`,
+                     mode: ModeType.MANUAL,
+                     savingTypeId: savingType.id,
+                     createdBy: s.user.email
+                  }
+  
+                  await queryRunner.manager.save(TransactionEntity, tr);
+  
+                  await this.updateOrSaveSavings(s.user, amount, queryRunner, savingType.id);
+  
+                  let newDate;
+                  switch (s.frequency) {
+                      case SavingsFrequency.DAILY: {
+                          newDate = addDaysToCurrentDate(1)
+                          s.nextSaveDate = newDate;
+                          break;
+                      }
+                      case SavingsFrequency.WEEKLY: {
+                          newDate = addDaysToCurrentDate(7)
+                          s.nextSaveDate = newDate;
+                          break;
+                      }
+                      case SavingsFrequency.MONTHLY: {
+                          newDate = addDaysToCurrentDate(30)
+                          s.nextSaveDate = newDate;
+                          break;
+                      }
+                      default:
+                          this.logger.log("nothing");
+                  }
+  
+                  await queryRunner.manager.save(UserSettingEntity, s);
+                  
                 }
-
-                await queryRunner.manager.save(TransactionEntity, tr);
-
-                await this.updateOrSaveSavings(s.user, amount, queryRunner, savingType.id);
-
-                let newDate;
-                switch (s.frequency) {
-                    case SavingsFrequency.DAILY: {
-                        newDate = addDaysToCurrentDate(1)
-                        s.nextSaveDate = newDate;
-                        break;
-                    }
-                    case SavingsFrequency.WEEKLY: {
-                        newDate = addDaysToCurrentDate(7)
-                        s.nextSaveDate = newDate;
-                        break;
-                    }
-                    case SavingsFrequency.MONTHLY: {
-                        newDate = addDaysToCurrentDate(30)
-                        s.nextSaveDate = newDate;
-                        break;
-                    }
-                    default:
-                        this.logger.log("nothing");
-                }
-
-                await queryRunner.manager.save(UserSettingEntity, s);
-                
+  
               }
-
+             
             }
          }
 

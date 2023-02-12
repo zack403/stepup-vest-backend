@@ -171,12 +171,8 @@ export class HttpRequestService {
         return result;
       
     } catch (error) {
-        this.logger.log(`error in paystack recurring charge - ${error} - ${error.message}`)
-        return clientFeedback({
-            message:  `Something failed, ${error.response.data.message}`,
-            status: 500,
-            trace: error
-        })
+        this.logger.error(`error in paystack recurring charge - ${error} - ${error.response.data.message}`)
+
     }
   }
 
