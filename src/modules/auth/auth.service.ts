@@ -73,7 +73,7 @@ export class AuthService {
       const userData = plainToClass(UserEntity, request);
       userData.createdBy = request.email;
       userData.password = hashedPassword;
-      userData.referralCode = `Ref_${generateUniqueCode()}`
+      userData.referralCode = `ref_${generateUniqueCode()}`
 
 
       const saved = await queryRunner.manager.save(UserEntity, userData);
