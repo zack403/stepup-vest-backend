@@ -310,7 +310,7 @@ async findByUserId(id: string):Promise<UserEntity> {
   }
 
   async update(payload: UpdateUserDto, user: UserEntity): Promise<IClientReturnObject> {
-    console.log({payload});
+    
     try {
       const us = await this.userRepo.findOne({where: {id: user.id}});
       if(!us) {
@@ -329,9 +329,6 @@ async findByUserId(id: string):Promise<UserEntity> {
 
       delete updated.password;
       delete updated.isAdmin;
-
-    console.log({updated});
-
 
       return clientFeedback({
         message: "Successfully updated",
