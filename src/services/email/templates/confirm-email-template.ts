@@ -133,8 +133,8 @@ export function ConfirmEmail(user: UserEntity, link): string {
                       
                       <p style="margin-top: 4px">
                       Office: Suite 4, Kingsley Plaza, Taiwo Kein Fasuba, Governor's Rd, Ikotun 100211, Lagos. <br>
-                      Phone: 08034433125 (Mon-Fri from 9am-5pm) <br>
-                      Email: info.rollworldmag@gmail.com <br>
+                      Phone: +2348171748663 (Mon-Fri from 9am-5pm) <br>
+                      Email: support@stepupvest.com <br>
                       StepupVest, © 2023
                         
                       </p>
