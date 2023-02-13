@@ -1,7 +1,10 @@
-import { AfterLoad, Column, Entity, Index } from 'typeorm';
+import { AfterLoad, Column, Entity, Index, OneToMany } from 'typeorm';
 import { classToPlain, Exclude, instanceToPlain } from 'class-transformer';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
 import { IsEmail } from 'class-validator';
+import { TransactionEntity } from 'src/modules/transactions/transaction.entity';
+import { SavingsEntity } from 'src/modules/savings/savings.entity';
+import { WithdrawalEntity } from 'src/modules/withdrawals/withdrawal.entity';
 
 @Entity('User')
 export class UserEntity extends AbstractBaseEntity {
@@ -77,6 +80,17 @@ export class UserEntity extends AbstractBaseEntity {
   
   @Column({type: 'bool', default: false })
   referredBySettled: boolean;
+
+  //relations
+  @OneToMany(() => TransactionEntity, t => t.user, {onDelete: 'CASCADE'})
+  transactions: TransactionEntity[];
+
+  @OneToMany(() => SavingsEntity, t => t.user, {onDelete: 'CASCADE'})
+  savings: SavingsEntity[];
+
+  @OneToMany(() => WithdrawalEntity, t => t.user, {onDelete: 'CASCADE'})
+  withdrawals: WithdrawalEntity[];
+  
 
   @AfterLoad()
   toNumber() {
