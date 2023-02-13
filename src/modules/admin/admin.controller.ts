@@ -1,4 +1,4 @@
-import { Controller, Body,  Req, Res, UseGuards, Post, Get} from '@nestjs/common';
+import { Controller, Body,  Req, Res, UseGuards, Post, Get, Param} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
@@ -39,4 +39,21 @@ export class AdminController {
     res.status(result.status).json(result);
   }
  
+  @Get('/savings-types/:slug')
+  @ApiOperation({summary: 'Savings returned successfully'})
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 201, description: 'Savings returned successfully' })
+  async getSavingsByTypeSlug(
+    @Param('slug') slug: string,
+    @Req() req: any,
+    @Res() res: Response) : Promise<void> 
+  {
+    if(!req.user.isAdmin) {
+      res.status(403).json({status: 403, message: 'Access denied!'});
+      return;
+    }
+    const result = await this.admSvc.getSavingsTypeBySlug(slug);
+    res.status(200).json({status: 200, message: 'Savings type fetched successfully', data: result});
+  }
+
 }
