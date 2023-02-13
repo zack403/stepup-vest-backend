@@ -226,8 +226,8 @@ export class SavingsService {
                 amount: s.amount * 100 
               }
 
-              const {data} = await this.httpReqSvc.recurringCharge(p);
-
+              const result = await this.httpReqSvc.recurringCharge(p);
+              const {data} = result;
               if(data) {
                 if(data.status === 'success') {
                 
