@@ -1,13 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
 import { AppService } from 'src/app.service';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { ModeType, TransactionStatus } from 'src/utils/enum';
 import { HttpRequestService } from 'src/utils/http-request';
 import { DataSource } from 'typeorm';
-import { AddCardDto } from '../user/dto/add-card.dto';
+import { TransactionService } from '../transactions/transaction.service';
 import { UserEntity } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { VerifyAccountDto } from './dto/verify-account.dto';
@@ -19,7 +16,7 @@ export class VerificationService {
 
   constructor(private userSvc: UserService,
     private dataSource: DataSource,
-    private appSvc: AppService, 
+    private transSvc: TransactionService,
     private httpReqSvc: HttpRequestService) {}
 
   async verifyBVN(bvn, user: UserEntity): Promise<IClientReturnObject> {
@@ -113,7 +110,14 @@ export class VerificationService {
   
         await queryRunner.connect();
         await queryRunner.startTransaction();
-  
+
+        const refExist = await this.transSvc.findTransactionByReference(referenceCode);
+        if(!refExist) {
+          return clientFeedback( {
+            status: 400,
+            message: 'Invalid reference'
+          })
+        }
 
         const result = await this.httpReqSvc.verifyPayment(referenceCode);
 
@@ -130,7 +134,10 @@ export class VerificationService {
     
           if (data.status === "success") {
   
-            return await this.appSvc.onChargeSuccess(data, queryRunner);
+            return clientFeedback({
+              status: 200,
+              message: `Your payment was successful`
+            })
     
           }
         }

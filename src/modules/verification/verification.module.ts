@@ -6,7 +6,6 @@ import { HttpRequestService } from 'src/utils/http-request';
 import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
-import { AppService } from 'src/app.service';
 import { TransactionService } from '../transactions/transaction.service';
 import { TransactionModule } from '../transactions/transaction.module';
 import { SavingsService } from '../savings/savings.service';
@@ -30,7 +29,6 @@ import { WithdrawalsModule } from '../withdrawals/withdrawal.module';
     VerificationService,
     UserService, 
     HttpRequestService, 
-    AppService, 
     SavingsService, 
     AdminService, 
     TransactionService
