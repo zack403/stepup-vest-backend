@@ -20,7 +20,7 @@ export class AddCardDto {
     @IsString()
     @ApiProperty()
     @IsNotEmpty()
-    authorizatioCode: string;
+    authorizationCode: string;
 
     @IsString()
     @ApiProperty()

@@ -138,7 +138,7 @@ export class AppService {
               const request: AddCardDto = {
                 email: user.email,
                 userId: user.id,
-                authorizatioCode: authorization.authorization_code,
+                authorizationCode: authorization.authorization_code,
                 cardType: authorization.card_type,
                 last4: authorization.last4,
                 expMonth: authorization.exp_month,
@@ -170,6 +170,8 @@ export class AppService {
             this.logger.log("transaction updated");
 
             await this.savingsSvc.updateOrSaveSavings(user, amount, queryRunner);
+
+            await this.savingsSvc.checkIfReferralCanClaimBonus(user);
 
             this.logger.log("savings updated updated");
             break;

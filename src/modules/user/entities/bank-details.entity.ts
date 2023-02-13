@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
+import { UserEntity } from './user.entity';
 
 @Entity('BankDetails')
 export class BankDetailsEntity extends AbstractBaseEntity {
@@ -24,6 +25,10 @@ export class BankDetailsEntity extends AbstractBaseEntity {
   
   @Column({type: "varchar", nullable: true})
   accountType: string;
+
+  @ManyToOne(() => UserEntity)
+  user: UserEntity;
+
   
 
 }

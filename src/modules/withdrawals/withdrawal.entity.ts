@@ -1,4 +1,4 @@
-import { AfterLoad, Column, Entity, ManyToOne } from 'typeorm';
+import { AfterLoad, Column, Entity, Index, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from 'src/utils/base-entity';
 import { WithdrawalStatus } from 'src/utils/enum';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
@@ -23,6 +23,7 @@ export class WithdrawalEntity extends AbstractBaseEntity {
     @Column({ type: 'varchar'})
     percentageCharged: string;
 
+    @Index()
     @Column({ type: 'varchar', nullable: true})
     reference: string;
 
