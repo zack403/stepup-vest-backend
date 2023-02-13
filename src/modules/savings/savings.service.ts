@@ -111,8 +111,6 @@ export class SavingsService {
 
           const saved = await this.transSvc.saveTrans(data);
 
-          await this.checkIfReferralCanClaimBonus(user);
-
           return clientFeedback({
               status: 200,
               message: 'Quick safe reference generated successfully',
@@ -223,7 +221,7 @@ export class SavingsService {
             
             if(card) {
               const p = { 
-                authorization_code : card.authorizatioCode, 
+                authorization_code : card.authorizationCode, 
                 email: s.user.email, 
                 amount: s.amount * 100 
               }
@@ -273,6 +271,8 @@ export class SavingsService {
                   }
   
                   await queryRunner.manager.save(UserSettingEntity, s);
+
+                  await this.checkIfReferralCanClaimBonus(s.user);
                   
                 }
   

@@ -13,7 +13,7 @@ export class CardEntity extends AbstractBaseEntity {
   userId: string;
 
   @Column({type: "varchar", length: 128})
-  authorizatioCode: string;
+  authorizationCode: string;
 
   @Column({type: "varchar", length: 128})
   cardType: string;
