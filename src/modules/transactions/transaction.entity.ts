@@ -1,6 +1,7 @@
-import { AfterLoad, Column, CreateDateColumn, Entity } from 'typeorm';
+import { AfterLoad, Column, CreateDateColumn, Entity, Index, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from 'src/utils/base-entity';
 import { ModeType, TransactionStatus, TransactionType } from 'src/utils/enum';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Entity('Transaction')
 export class TransactionEntity extends AbstractBaseEntity {
@@ -12,6 +13,7 @@ export class TransactionEntity extends AbstractBaseEntity {
     @Column({type: 'uuid'})
     userId: string;
 
+    @Index()
     @Column({type: "varchar", length: 128})
     reference: string;
 
@@ -32,6 +34,10 @@ export class TransactionEntity extends AbstractBaseEntity {
 
     @Column({type: 'uuid', nullable: true})
     savingTypeId: string;
+
+    @ManyToOne(() => UserEntity)
+    user: UserEntity;
+
 
     @AfterLoad()
     toNumber() {

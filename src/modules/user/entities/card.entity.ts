@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
 import { IsEmail } from 'class-validator';
+import { UserEntity } from './user.entity';
 
 @Entity('Card')
 export class CardEntity extends AbstractBaseEntity {
@@ -48,6 +49,8 @@ export class CardEntity extends AbstractBaseEntity {
   @Column({type: 'bool', default: false })
   reusable: boolean;
 
+  @ManyToOne(() => UserEntity)
+  user: UserEntity;
 
 
 }

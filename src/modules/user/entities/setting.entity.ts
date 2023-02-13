@@ -1,6 +1,7 @@
 import { SavingsDayOfTheWeek, SavingsFrequency, TimeToSave, WhenToStartSaving } from 'src/utils/enum';
 import {  Column, Entity, ManyToOne } from 'typeorm';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
+import { CardEntity } from './card.entity';
 import { UserEntity } from './user.entity';
 
 @Entity('UserSetting')
@@ -38,6 +39,9 @@ export class UserSettingEntity extends AbstractBaseEntity {
   
   @ManyToOne(() => UserEntity)
   user: UserEntity;
+
+  @ManyToOne(() => CardEntity)
+  card: CardEntity;
 
 
 }

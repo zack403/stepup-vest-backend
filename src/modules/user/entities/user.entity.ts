@@ -1,4 +1,4 @@
-import { AfterLoad, Column, Entity } from 'typeorm';
+import { AfterLoad, Column, Entity, Index } from 'typeorm';
 import { classToPlain, Exclude, instanceToPlain } from 'class-transformer';
 import { AbstractBaseEntity } from '../../../utils/base-entity';
 import { IsEmail } from 'class-validator';
@@ -6,6 +6,7 @@ import { IsEmail } from 'class-validator';
 @Entity('User')
 export class UserEntity extends AbstractBaseEntity {
   
+  @Index()
   @IsEmail()
   @Column({ unique: true, length: 128 })
   email: string;
@@ -16,15 +17,18 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: "varchar", length: 128})
   lastName: string;
 
+  @Index()
   @Column({type: "varchar", length: 128})
   phoneNumber: string;
 
   @Column({type: "varchar", default: 'others', length: 128})
   heardAboutUs: string;
 
+  @Index()
   @Column({type: "varchar", length: 128})
   referralCode: string;
 
+  @Index()
   @Column({type: "varchar", nullable: true, length: 128})
   referredBy: string;
   
