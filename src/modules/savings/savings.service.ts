@@ -283,7 +283,7 @@ export class SavingsService {
         today.setHours(hour, minute, 0);
         today.setDate(today.getDate() + 1);
         data.nextSaveDate = today;
-        break;
+
       }
       case SavingsFrequency.WEEKLY: {
         // check if its current day
@@ -295,21 +295,20 @@ export class SavingsService {
           fridays: 5,
           saturdays: 6
         }
-        const today = new Date().getDay();
+        let today = new Date();
+        const r = today.getDay();
         const userDay = d[payload.dayToSave];
-        let noOfda = today - userDay;
+        let noOfda = r - userDay;
         noOfda = Math.abs(noOfda);
-
         const t = payload.timeToSave.split(":");
         const hour = parseInt(t[0]); const minute = parseInt(t[1]);
-        let to = new Date();
-        to.setHours(hour, minute, 0);
-        if (today >= userDay) {
-          to.setDate(to.getDate() + (7 - noOfda));
+        today.setHours(hour, minute, 0);
+        if (r >= userDay) {
+          today.setDate(today.getDate() + (7 - noOfda));
         } else {
-          to.setDate(to.getDate() + (noOfda + 7));
+          today.setDate(today.getDate() + (noOfda + 7));
         }
-        data.nextSaveDate = to;
+        data.nextSaveDate = today;
         break;
       }
       case SavingsFrequency.MONTHLY: {
@@ -319,7 +318,7 @@ export class SavingsService {
         const t = payload.timeToSave.split(":");
         const hour = parseInt(t[0]); const minute = parseInt(t[1]);
         today.setHours(hour, minute, 0);
-        today.setDate((noDaysInMonth - s) + payload.dayOfMonth);
+        today.setDate(s + ((noDaysInMonth - s) + payload.dayOfMonth));
         data.nextSaveDate = today;
         break;
       }
