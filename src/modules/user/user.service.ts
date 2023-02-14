@@ -477,8 +477,12 @@ async findByUserId(id: string):Promise<UserEntity> {
         let saved;
         if(set) {
 
-          if(set.frequency != payload.frequency || set.whenToStart != payload.whenToStart) {
-            this.savingSvc.populateNextSavingDate(set, payload);
+          if(set.frequency != payload.frequency || 
+            set.whenToStart != payload.whenToStart 
+            || set.dayToSave != payload.dayToSave || 
+            set.dayOfMonth != payload.dayOfMonth) 
+          {
+            this.savingSvc.populateNextSavingDateOnNewOrUpdate(set, payload);
           }
 
           set.autoSave = payload.autoSave;
@@ -489,6 +493,7 @@ async findByUserId(id: string):Promise<UserEntity> {
           set.dayOfMonth = payload.dayOfMonth ? payload.dayOfMonth : null;
           set.timeToSave = payload.timeToSave;
           set.whenToStart = payload.whenToStart;
+          set.updatedBy = user.email;
 
           await this.userSetRepo.save(set);
 
@@ -501,7 +506,7 @@ async findByUserId(id: string):Promise<UserEntity> {
           if(!newSet.dayToSave) newSet.dayToSave = null;
           if(!newSet.dayOfMonth) newSet.dayOfMonth = null;
 
-          this.savingSvc.populateNextSavingDate(newSet, payload);
+          this.savingSvc.populateNextSavingDateOnNewOrUpdate(newSet, payload);
 
           saved = await this.userSetRepo.save(newSet);
         }
