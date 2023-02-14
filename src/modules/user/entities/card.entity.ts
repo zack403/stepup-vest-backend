@@ -31,7 +31,7 @@ export class CardEntity extends AbstractBaseEntity {
   @Column({type: "varchar", length: 128})
   bin: string;
 
-  @Column({type: "varchar", length: 128})
+  @Column({type: "varchar", nullable: true, length: 128})
   bank: string;
 
   @Column({type: "varchar", length: 128})
