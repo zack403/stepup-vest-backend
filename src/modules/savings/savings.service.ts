@@ -287,12 +287,12 @@ export class SavingsService {
       case SavingsFrequency.WEEKLY: {
         // check if its current day
         const d = {
-          mondays: 2,
-          tuesdays: 3,
-          wednesdays: 4,
-          thursdays: 5,
-          fridays: 6,
-          saturdays: 7
+          mondays: 1,
+          tuesdays: 2,
+          wednesdays: 3,
+          thursdays: 4,
+          fridays: 5,
+          saturdays: 6
         }
         const today = new Date().getDay();
         const userDay = d[payload.dayToSave];
