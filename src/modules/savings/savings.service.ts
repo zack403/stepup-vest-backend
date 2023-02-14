@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { addDaysToCurrentDate } from 'src/utils/add-days-to-date';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { ModeType, SavingsFrequency, TransactionStatus, TransactionType } from 'src/utils/enum';
+import { ModeType, SavingsFrequency, TransactionStatus, TransactionType, WhenToStartSaving } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { HttpRequestService } from 'src/utils/http-request';
 import { QueryRunner, Repository } from 'typeorm';
@@ -11,6 +11,7 @@ import { AdminService } from '../admin/admin.service';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
 import { TransactionEntity } from '../transactions/transaction.entity';
 import { TransactionService } from '../transactions/transaction.service';
+import { UpdateUserSettingDto } from '../user/dto/update-setting.dto';
 import { CardEntity } from '../user/entities/card.entity';
 import { UserSettingEntity } from '../user/entities/setting.entity';
 import { UserEntity } from '../user/entities/user.entity';
@@ -250,27 +251,8 @@ export class SavingsService {
     
                     await this.updateOrSaveSavings(s.user, amount, queryRunner, savingType.id);
     
-                    let newDate;
-                    switch (s.frequency) {
-                        case SavingsFrequency.DAILY: {
-                            newDate = addDaysToCurrentDate(1)
-                            s.nextSaveDate = newDate;
-                            break;
-                        }
-                        case SavingsFrequency.WEEKLY: {
-                            newDate = addDaysToCurrentDate(7)
-                            s.nextSaveDate = newDate;
-                            break;
-                        }
-                        case SavingsFrequency.MONTHLY: {
-                            newDate = addDaysToCurrentDate(30)
-                            s.nextSaveDate = newDate;
-                            break;
-                        }
-                        default:
-                            this.logger.log("nothing");
-                    }
-    
+                    this.populateNextSavingDate(s, s);
+                    
                     await queryRunner.manager.save(UserSettingEntity, s);
   
                     await this.checkIfReferralCanClaimBonus(s.user);
@@ -287,6 +269,45 @@ export class SavingsService {
          if(queryRunner.isTransactionActive) {
           await queryRunner.commitTransaction();
          }
+    }
+
+    async populateNextSavingDate(data, payload: UpdateUserSettingDto) {
+      let newDate;
+      switch (payload.frequency) {
+          case SavingsFrequency.DAILY: {
+              if(payload.whenToStart === WhenToStartSaving.NOW) {
+                newDate = addDaysToCurrentDate(0)
+                data.nextSaveDate = newDate;
+              } else if (payload.whenToStart === WhenToStartSaving.TOMORROW) {
+                newDate = addDaysToCurrentDate(1)
+                data.nextSaveDate = newDate;
+              }
+              break;
+          }
+          case SavingsFrequency.WEEKLY: {
+              if(payload.whenToStart === WhenToStartSaving.NOW) {
+                newDate = addDaysToCurrentDate(0)
+                data.nextSaveDate = newDate;
+              } else if (payload.whenToStart === WhenToStartSaving.NEXT_WEEK) {
+                newDate = addDaysToCurrentDate(7)
+                data.nextSaveDate = newDate;
+              }
+              
+              break;
+          }
+          case SavingsFrequency.MONTHLY: {
+              if(payload.whenToStart === WhenToStartSaving.NOW) {
+                newDate = addDaysToCurrentDate(0)
+                data.nextSaveDate = newDate;
+              } else if (payload.whenToStart === WhenToStartSaving.NEXT_MONTH) {
+                newDate = addDaysToCurrentDate(30)
+                data.nextSaveDate = newDate;
+              }
+              break;
+          }
+          default:
+              this.logger.log("nothing");
+      }
     }
 
 
