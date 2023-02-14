@@ -56,7 +56,11 @@ export class VerificationService {
 
           }
 
-          return result;
+          return clientFeedback({
+            status: result.status ? 200 : 400,
+            message: result.message,
+            data: result.data
+          })
     
       } catch (error) {
         this.logger.error(error.message, error);
