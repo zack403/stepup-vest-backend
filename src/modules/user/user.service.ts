@@ -477,7 +477,11 @@ async findByUserId(id: string):Promise<UserEntity> {
         let saved;
         if(set) {
 
-          if(set.frequency != payload.frequency || set.whenToStart != payload.whenToStart) {
+          if(set.frequency != payload.frequency || 
+            set.whenToStart != payload.whenToStart 
+            || set.dayToSave != payload.dayToSave || 
+            set.dayOfMonth != payload.dayOfMonth) 
+          {
             this.savingSvc.populateNextSavingDateOnNewOrUpdate(set, payload);
           }
 
