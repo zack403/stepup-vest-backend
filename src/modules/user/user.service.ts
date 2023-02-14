@@ -5,7 +5,7 @@ import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { JwtPayload } from 'src/types/jwtPayload';
 import { addDaysToCurrentDate } from 'src/utils/add-days-to-date';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
-import { SavingsFrequency, WithdrawalStatus } from 'src/utils/enum';
+import { SavingsFrequency, WhenToStartSaving, WithdrawalStatus } from 'src/utils/enum';
 import { HttpRequestService } from 'src/utils/http-request';
 import { DataSource, QueryRunner } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
@@ -477,8 +477,8 @@ async findByUserId(id: string):Promise<UserEntity> {
         let saved;
         if(set) {
 
-          if(set.frequency != payload.frequency) {
-            this.populateNextSavingDate(set, payload);
+          if(set.frequency != payload.frequency || set.whenToStart != payload.whenToStart) {
+            this.savingSvc.populateNextSavingDate(set, payload);
           }
 
           set.autoSave = payload.autoSave;
@@ -501,8 +501,7 @@ async findByUserId(id: string):Promise<UserEntity> {
           if(!newSet.dayToSave) newSet.dayToSave = null;
           if(!newSet.dayOfMonth) newSet.dayOfMonth = null;
 
-          this.populateNextSavingDate(newSet, payload);
-
+          this.savingSvc.populateNextSavingDate(newSet, payload);
 
           saved = await this.userSetRepo.save(newSet);
         }
@@ -538,26 +537,4 @@ async findByUserId(id: string):Promise<UserEntity> {
     return false;
   }
   
-  async populateNextSavingDate(data, payload) {
-    let newDate;
-    switch (payload.frequency) {
-        case SavingsFrequency.DAILY: {
-            newDate = addDaysToCurrentDate(1)
-            data.nextSaveDate = newDate;
-            break;
-        }
-        case SavingsFrequency.WEEKLY: {
-            newDate = addDaysToCurrentDate(7)
-            data.nextSaveDate = newDate;
-            break;
-        }
-        case SavingsFrequency.MONTHLY: {
-            newDate = addDaysToCurrentDate(30)
-            data.nextSaveDate = newDate;
-            break;
-        }
-        default:
-            this.logger.log("nothing");
-    }
-  }
 }
