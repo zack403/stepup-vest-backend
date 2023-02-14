@@ -396,24 +396,20 @@ export class SavingsService {
       case SavingsFrequency.MONTHLY: {
         let today = new Date();
         let s = today.getDate();
-        let monthday = today.getDate() - payload.dayOfMonth;
+        let monthday = s - payload.dayOfMonth;
         monthday = Math.abs(monthday);
         const noDaysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
         if (payload.whenToStart === WhenToStartSaving.NOW) {
           const t = payload.timeToSave.split(":");
           const hour = parseInt(t[0]); const minute = parseInt(t[1]);
           today.setHours(hour, minute, 0);
-          today.setDate(today.getDate() + monthday);
+          today.setDate(s + monthday);
           data.nextSaveDate = today;
         } else if (payload.whenToStart === WhenToStartSaving.NEXT_MONTH) {
           const t = payload.timeToSave.split(":");
           const hour = parseInt(t[0]); const minute = parseInt(t[1]);
           today.setHours(hour, minute, 0);
-          if (s >= monthday) {
-            today.setDate(today.getDate() + (noDaysInMonth - monthday));
-          } else {
-            today.setDate(today.getDate() + (monthday + noDaysInMonth));
-          }
+          today.setDate((noDaysInMonth - s) + payload.dayOfMonth);          
           data.nextSaveDate = today;
         }
         break;
