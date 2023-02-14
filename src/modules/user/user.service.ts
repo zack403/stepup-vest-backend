@@ -478,7 +478,7 @@ async findByUserId(id: string):Promise<UserEntity> {
         if(set) {
 
           if(set.frequency != payload.frequency || set.whenToStart != payload.whenToStart) {
-            this.savingSvc.populateNextSavingDate(set, payload);
+            this.savingSvc.populateNextSavingDateOnNewOrUpdate(set, payload);
           }
 
           set.autoSave = payload.autoSave;
@@ -501,7 +501,7 @@ async findByUserId(id: string):Promise<UserEntity> {
           if(!newSet.dayToSave) newSet.dayToSave = null;
           if(!newSet.dayOfMonth) newSet.dayOfMonth = null;
 
-          this.savingSvc.populateNextSavingDate(newSet, payload);
+          this.savingSvc.populateNextSavingDateOnNewOrUpdate(newSet, payload);
 
           saved = await this.userSetRepo.save(newSet);
         }
