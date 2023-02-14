@@ -493,6 +493,7 @@ async findByUserId(id: string):Promise<UserEntity> {
           set.dayOfMonth = payload.dayOfMonth ? payload.dayOfMonth : null;
           set.timeToSave = payload.timeToSave;
           set.whenToStart = payload.whenToStart;
+          set.updatedBy = user.email;
 
           await this.userSetRepo.save(set);
 

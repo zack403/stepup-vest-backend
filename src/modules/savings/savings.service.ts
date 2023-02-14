@@ -148,6 +148,7 @@ export class SavingsService {
     if (saving) {
 
       saving.balance += amount;
+      saving.updatedBy = user.email;
 
       await queryRunner.manager.save(SavingsEntity, saving);
 
@@ -400,7 +401,7 @@ export class SavingsService {
           const t = payload.timeToSave.split(":");
           const hour = parseInt(t[0]); const minute = parseInt(t[1]);
           today.setHours(hour, minute, 0);
-          today.setDate((noDaysInMonth - s) + payload.dayOfMonth);
+          today.setDate(s + ((noDaysInMonth - s) + payload.dayOfMonth));
           data.nextSaveDate = today;
         }
         break;

@@ -162,7 +162,8 @@ export class AppService {
             const data = {
               amount,
               status: TransactionStatus.COMPLETED,
-              transactionDate: new Date()
+              transactionDate: new Date(),
+              updatedBy: user.email
             }
 
             await this.transSvc.updateTransactionByReference(transaction.reference, data, queryRunner);
