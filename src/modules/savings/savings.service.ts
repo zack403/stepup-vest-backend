@@ -309,26 +309,17 @@ export class SavingsService {
           to.setDate(to.getDate() + (noOfda + 7));
         }
         data.nextSaveDate = to;
-
-
         break;
       }
       case SavingsFrequency.MONTHLY: {
         let today = new Date();
         let s = today.getDate();
-        let monthday = today.getDate() - payload.dayOfMonth;
-        monthday = Math.abs(monthday);
         const noDaysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
         const t = payload.timeToSave.split(":");
         const hour = parseInt(t[0]); const minute = parseInt(t[1]);
         today.setHours(hour, minute, 0);
-        if (s >= monthday) {
-          today.setDate(today.getDate() + (noDaysInMonth - monthday));
-        } else {
-          today.setDate(today.getDate() + (monthday + noDaysInMonth));
-        }
+        today.setDate((noDaysInMonth - s) + payload.dayOfMonth);
         data.nextSaveDate = today;
-
         break;
       }
       default:
@@ -409,7 +400,7 @@ export class SavingsService {
           const t = payload.timeToSave.split(":");
           const hour = parseInt(t[0]); const minute = parseInt(t[1]);
           today.setHours(hour, minute, 0);
-          today.setDate((noDaysInMonth - s) + payload.dayOfMonth);          
+          today.setDate((noDaysInMonth - s) + payload.dayOfMonth);
           data.nextSaveDate = today;
         }
         break;
