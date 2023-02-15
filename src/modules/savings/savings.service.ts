@@ -11,7 +11,7 @@ import {
 } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { HttpRequestService } from 'src/utils/http-request';
-import { QueryRunner, Repository } from 'typeorm';
+import { LessThanOrEqual, QueryRunner, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
 import { SavingsTypeEntity } from '../admin/entities/savings-type.entity';
 import { TransactionEntity } from '../transactions/transaction.entity';
@@ -213,11 +213,19 @@ export class SavingsService {
   }
 
   async runAutoSave(queryRunner: QueryRunner) {
-    const usersInAutoSave = await this.userSetRepo
-      .createQueryBuilder('s')
-      .where('s.nextSaveDate <= CURRENT_TIMESTAMP AND s.autoSave = true')
-      .leftJoinAndSelect('s.user', 'user')
-      .getMany();
+    // const usersInAutoSave = await this.userSetRepo
+    //   .createQueryBuilder('s')
+    //   .where('s.nextSaveDate <= CURRENT_TIMESTAMP AND s.autoSave = true')
+    //   .leftJoinAndSelect('s.user', 'user')
+    //   .getMany();
+
+    const usersInAutoSave = await this.userSetRepo.find({
+      where: {
+        nextSaveDate: LessThanOrEqual(new Date()),
+        autoSave: true,
+      },
+      relations: { user: true },
+    });
 
     let savingType = await this.adminSvc.getStepUpSavingsType();
 
