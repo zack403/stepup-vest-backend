@@ -19,11 +19,10 @@ import { SeedsModule } from './seeds/seeds.module';
 import { JobTaskModule } from './services/task-jobs/task-jobs.module';
 import { HttpRequestService } from './utils/http-request';
 
-
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
-    TypeOrmModule.forRoot(dbConfig),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot({ ...dbConfig, autoLoadEntities: true }),
     AuthModule,
     UserModule,
     VerificationModule,
@@ -34,13 +33,9 @@ import { HttpRequestService } from './utils/http-request';
     SeedsModule,
     WithdrawalsModule,
     ScheduleModule.forRoot(),
-    JobTaskModule
+    JobTaskModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService, 
-    HttpRequestService, 
-    TransactionService, 
-    UserService],
+  providers: [AppService, HttpRequestService, TransactionService, UserService],
 })
 export class AppModule {}
