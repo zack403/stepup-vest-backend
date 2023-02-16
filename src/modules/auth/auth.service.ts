@@ -238,7 +238,7 @@ export class AuthService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const frontednUrl = this.configService.get('FRONTED_URL');
+    const frontednUrl = this.configService.get('FRONTEND_URL');
     const user = await this.userSvc.findByEmail(email);
 
     if (user) {
