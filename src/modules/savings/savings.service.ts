@@ -231,7 +231,7 @@ export class SavingsService {
 
     for (const s of usersInAutoSave) {
       this.logger.log(
-        `Running Auto save for ${s.user.firstName} ${s.user.lastName}`,
+        `Running Auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email}`,
       );
       const card = await this.cardRepo.findOne({
         where: { id: s.cardId, userId: s.userId, reusable: true },
