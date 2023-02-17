@@ -230,6 +230,9 @@ export class SavingsService {
     let savingType = await this.adminSvc.getStepUpSavingsType();
 
     for (const s of usersInAutoSave) {
+      this.logger.log(
+        `Running Auto save for ${s.user.firstName} ${s.user.lastName}`,
+      );
       const card = await this.cardRepo.findOne({
         where: { id: s.cardId, userId: s.userId, reusable: true },
       });
@@ -273,6 +276,9 @@ export class SavingsService {
               await queryRunner.manager.save(UserSettingEntity, rs);
 
               await this.checkIfReferralCanClaimBonus(s.user);
+              this.logger.log(
+                `Running Auto save for ${s.user.firstName} ${s.user.lastName} was successful`,
+              );
             }
           }
         }
