@@ -259,6 +259,11 @@ export class VerificationService {
           }
         }
 
+        return clientFeedback({
+          status: 400,
+          message: result.message
+        })
+
       }
 
       return clientFeedback({
