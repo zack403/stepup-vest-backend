@@ -7,10 +7,12 @@ import { SavingsService } from './modules/savings/savings.service';
 import { TransactionEntity } from './modules/transactions/transaction.entity';
 import { TransactionService } from './modules/transactions/transaction.service';
 import { AddCardDto } from './modules/user/dto/add-card.dto';
+import { UserEntity } from './modules/user/entities/user.entity';
 import { UserService } from './modules/user/user.service';
 import { WithdrawalEntity } from './modules/withdrawals/withdrawal.entity';
 import { WithdrawalService } from './modules/withdrawals/withdrawal.service';
 import { IClientReturnObject } from './types/clientReturnObj';
+import { addDaysToCurrentDate } from './utils/add-days-to-date';
 import { clientFeedback } from './utils/clientReturnfunction';
 import { ModeType, TransactionStatus, TransactionType, WithdrawalStatus } from './utils/enum';
 import { HttpRequestService } from './utils/http-request';
@@ -275,7 +277,17 @@ export class AppService {
             createdBy: user.email
           }
           await queryRunner.manager.save(TransactionEntity, data2);
-          this.logger.log("transaction inserted");  
+          this.logger.log("transaction inserted");
+          
+          await queryRunner.manager.update(
+            UserEntity,
+            {
+              id: user.id,
+            },
+            {
+              withdrawDate: addDaysToCurrentDate(30),
+            },
+          );
 
         } else if(event === 'failed') {
 

@@ -38,7 +38,7 @@ export class SavingsService {
     private readonly httpReqSvc: HttpRequestService,
     @InjectRepository(SavingsEntity)
     private saveRepo: Repository<SavingsEntity>,
-  ) {}
+  ) { }
 
   async getSavingsByType(
     userId: string,
@@ -272,6 +272,7 @@ export class SavingsService {
                 queryRunner,
                 savingType.id,
               );
+              
               const rs = await this.populateNextSavingDate(s, s);
               await queryRunner.manager.save(UserSettingEntity, rs);
 

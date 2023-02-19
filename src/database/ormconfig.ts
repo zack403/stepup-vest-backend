@@ -8,7 +8,7 @@ const databaseConfig: DataSourceOptions = {
   ssl:
     process.env.NODE_ENV === 'production'
       ? { rejectUnauthorized: false }
-      : true,
+      : false,
   entities: [
     __dirname + '/../**/*.entity.ts',
     __dirname + '/../**/*.entity.js',

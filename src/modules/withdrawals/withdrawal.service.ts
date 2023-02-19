@@ -6,6 +6,7 @@ import { clientFeedback } from 'src/utils/clientReturnfunction';
 import { WithdrawalStatus } from 'src/utils/enum';
 import { generatePaymentRef } from 'src/utils/generate-payment-ref';
 import { HttpRequestService } from 'src/utils/http-request';
+import { isTodayDate } from 'src/utils/isTodayDate';
 import { Brackets, Repository } from 'typeorm';
 import { AdminService } from '../admin/admin.service';
 import { SavingsService } from '../savings/savings.service';
@@ -85,9 +86,8 @@ export class WithdrawalService {
           data.amountToDisburse = amountToDisburse;
 
           const saved = await this.withRepo.save(data);
-          const now = new Date();
 
-          if(now.getDate() === setting.withdrawalDay) {
+          if(isTodayDate(user.withdrawDate)) {
              await this.approve(saved.id, user);
           }
 
@@ -391,41 +391,36 @@ export class WithdrawalService {
   }
 
   async initiateTransfer(): Promise<any> {
-    const set = await this.admSvc.getSetting();
-    const today = new Date();
+    const result = await this.withRepo.createQueryBuilder("w")
+    .leftJoinAndSelect("w.user", "user")
+    .where("w.approved = :app", {app: true})
+    .andWhere(new Brackets(qb => {
+      qb.where("w.status = :st", {st: WithdrawalStatus.PENDING})
+      .orWhere("w.status = :s", {s: WithdrawalStatus.FAILED})
+    })).getMany();
 
-    if(set.withdrawalDay === today.getDate()) {
-
-        const result = await this.withRepo.createQueryBuilder("w")
-        .leftJoinAndSelect("w.user", "user")
-        .where("w.approved = :app", {app: true})
-        .andWhere(new Brackets(qb => {
-          qb.where("w.status = :st", {st: WithdrawalStatus.PENDING})
-          .orWhere("w.status = :s", {s: WithdrawalStatus.FAILED})
-        })).getMany();
-
-        if(result.length > 0) {
-          this.logger.log("initiating transfer");
-          for (const r of result) {
-            const bankDetails = await this.userSvc.getOneUserBankDetails(r.userId);
-             if(bankDetails) {
-
-              let amount = r.amountToDisburse * 100;
-              const payload = { 
-                source: "balance", 
-                amount,
-                reference: r.reference, 
-                recipient: bankDetails.recipientCode, 
-                reason: `Withdrawing ${r.amountToDisburse} for ${r.user.email}` 
-              }
-
-              const response = await this.httpReqSvc.initiateTransfer(payload);
-              this.logger.log(response);
-             }
+    if(result.length > 0) {
+      this.logger.log("initiating transfer");
+      for (const r of result) {
+        if(isTodayDate(r.user.withdrawDate)) {
+          const bankDetails = await this.userSvc.getOneUserBankDetails(r.userId);
+          if(bankDetails) {
+  
+            let amount = r.amountToDisburse * 100;
+            const payload = { 
+              source: "balance", 
+              amount,
+              reference: r.reference, 
+              recipient: bankDetails.recipientCode, 
+              reason: `Withdrawing ${r.amountToDisburse} for ${r.user.email}` 
+            }
+  
+            const response = await this.httpReqSvc.initiateTransfer(payload);
+            this.logger.log(response);
           }
         }
-
-    } 
+      }
+    }
   }
 
   async singleTransfer(id: string, user: UserEntity): Promise<IClientReturnObject> {

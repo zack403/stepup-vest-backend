@@ -81,6 +81,9 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: 'bool', default: false })
   referredBySettled: boolean;
 
+  @Column({ type: 'date', nullable: true})
+  withdrawDate: Date;
+
   //relations
   @OneToMany(() => TransactionEntity, t => t.user, {onDelete: 'CASCADE'})
   transactions: TransactionEntity[];

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { addDaysToCurrentDate } from 'src/utils/add-days-to-date';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
 import { hashPassword, verifyPassword } from 'src/utils/hasher';
 import { DataSource, Not, Repository } from 'typeorm';
@@ -35,7 +36,7 @@ export class AuthService {
     @InjectRepository(PasswordResetEntity)
     private passwordResetRepo: Repository<PasswordResetEntity>,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   async register(request: RegisterDto): Promise<IClientReturnObject> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -73,6 +74,7 @@ export class AuthService {
       userData.createdBy = request.email;
       userData.password = hashedPassword;
       userData.referralCode = `ref${generateUniqueCode()}`;
+      userData.withdrawDate = addDaysToCurrentDate(30);
 
       const saved = await queryRunner.manager.save(UserEntity, userData);
 

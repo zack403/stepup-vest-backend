@@ -34,7 +34,7 @@ export class UserService {
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     @InjectRepository(UserSettingEntity)
     private userSetRepo: Repository<UserSettingEntity>,
-  ) {}
+  ) { }
 
   async addBankDetails(
     req: AddBankDetailsDto,
@@ -412,7 +412,7 @@ export class UserService {
           referralBonus,
         },
       });
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async removeCard(cardId, user: UserEntity): Promise<IClientReturnObject> {

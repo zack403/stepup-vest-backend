@@ -10,22 +10,27 @@ export class AutoSaveService {
   constructor(
     private savingSvc: SavingsService,
     private dataSource: DataSource,
-  ) {}
+  ) { }
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async handle() {
+
     this.logger.log('Auto saving service started');
+    
     const queryRunner = this.dataSource.createQueryRunner();
 
     try {
+
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
       await this.savingSvc.runAutoSave(queryRunner);
-    } catch (error) {
-      this.logger.error(`Error in auto saving - ${error.message}`);
 
+    } catch (error) {
+      
+      this.logger.error(`${error.message}`, `Error in auto saving-${error}`, `{error}`);
       await queryRunner.rollbackTransaction();
+
     } finally {
       await queryRunner.release();
     }

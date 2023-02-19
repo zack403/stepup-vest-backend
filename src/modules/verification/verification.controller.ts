@@ -51,5 +51,16 @@ export class VerificationController {
       const result = await this.verifySvc.verifyPayment(param['reference_code'], req.user);
       res.status(result.status).json(result)
   }
+
+  @Get('reconcile-payment/:reference_code')
+  @ApiParam({ name: 'reference_code', type: String})
+  @ApiOkResponse({ description: 'Confirm if payment was successfull and do necessary reconciliation' })
+  @ApiBadRequestResponse({ description: 'The pay failed' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error, check the response body' })
+  async reconcilePayment(@Res() res: Response, @Req() req: any, @Param() param: any) {
+    
+      const result = await this.verifySvc.reconcilePayment(param['reference_code'], req.user);
+      res.status(result.status).json(result)
+  }
  
 }

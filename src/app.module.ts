@@ -38,4 +38,4 @@ import { HttpRequestService } from './utils/http-request';
   controllers: [AppController],
   providers: [AppService, HttpRequestService, TransactionService, UserService],
 })
-export class AppModule {}
+export class AppModule { }
