@@ -247,11 +247,6 @@ export class VerificationService {
               savingType.id,
             );
 
-            const s = await this.userSvc.getSetting(user);
-            
-            const rs = await this.savingSvc.populateNextSavingDate(s.data, s.data);
-            await queryRunner.manager.save(UserSettingEntity, rs);
-
             await this.savingSvc.checkIfReferralCanClaimBonus(user);
 
             await queryRunner.commitTransaction();
