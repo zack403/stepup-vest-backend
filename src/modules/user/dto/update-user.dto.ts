@@ -28,5 +28,10 @@ export class UpdateUserDto {
     @IsOptional()
     @Expose()
     employmentStatus: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @Expose()
+    address: string;
         
 }

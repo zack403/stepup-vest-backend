@@ -24,6 +24,9 @@ export class UserEntity extends AbstractBaseEntity {
   @Column({type: "varchar", length: 128})
   phoneNumber: string;
 
+  @Column({type: "text", nullable: true, length: 128})
+  address: string;
+
   @Column({type: "varchar", default: 'others', length: 128})
   heardAboutUs: string;
 

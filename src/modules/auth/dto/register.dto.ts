@@ -20,23 +20,28 @@ export class RegisterDto {
 
     @IsString()
     @ApiProperty()
-    @MinLength(3, {message: 'firstName should be minimum 3 characters long'})
-    @MaxLength(50, {message: 'firstName should be maximum 70 characters long'})  
+    @MinLength(3)
+    @MaxLength(50)  
     @IsNotEmpty()
     firstName: string;
 
     @IsString()
     @ApiProperty()
-    @MinLength(3, {message: 'lastName should be minimum 3 characters long'})
-    @MaxLength(50, {message: 'lastName should be maximum 70 characters long'})  
+    @MinLength(3)
+    @MaxLength(50)  
     @IsNotEmpty()
     lastName: string;
 
     @IsString()
     @ApiProperty()
     @IsNotEmpty()
-    @Matches(/^[0-9]*$/, {message: 'phoneNumber Number should be of type number'})
+    @Matches(/^[0-9]*$/)
     phoneNumber: string;
+
+    @IsString()
+    @ApiProperty()
+    @IsNotEmpty()
+    address: string;
 
     @IsString()
     @ApiProperty({default: 'facebook'})
