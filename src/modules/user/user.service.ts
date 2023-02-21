@@ -522,4 +522,8 @@ export class UserService {
     if (bank) return true;
     return false;
   }
+
+  async getAllUsers(): Promise<UserEntity[]> {
+    return await this.userRepo.find();
+  }
 }

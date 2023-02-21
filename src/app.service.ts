@@ -12,10 +12,10 @@ import { UserService } from './modules/user/user.service';
 import { WithdrawalEntity } from './modules/withdrawals/withdrawal.entity';
 import { WithdrawalService } from './modules/withdrawals/withdrawal.service';
 import { IClientReturnObject } from './types/clientReturnObj';
-import { addDaysToCurrentDate } from './utils/add-days-to-date';
 import { clientFeedback } from './utils/clientReturnfunction';
 import { ModeType, TransactionStatus, TransactionType, WithdrawalStatus } from './utils/enum';
 import { HttpRequestService } from './utils/http-request';
+import { nextWithdrawalDate } from './utils/next-withdrawal-date';
 
 @Injectable()
 export class AppService {
@@ -285,7 +285,7 @@ export class AppService {
               id: user.id,
             },
             {
-              withdrawDate: addDaysToCurrentDate(30),
+              withdrawDate: nextWithdrawalDate(user.withdrawDate),
             },
           );
 

@@ -6,6 +6,7 @@ import { plainToClass } from 'class-transformer';
 import { addDaysToCurrentDate } from 'src/utils/add-days-to-date';
 import { generateUniqueCode } from 'src/utils/generate-unique-code';
 import { hashPassword, verifyPassword } from 'src/utils/hasher';
+import { nextWithdrawalDate } from 'src/utils/next-withdrawal-date';
 import { DataSource, Not, Repository } from 'typeorm';
 import { EmailService } from '../../services/email/email.service';
 import { IClientReturnObject } from '../../types/clientReturnObj';
@@ -74,7 +75,7 @@ export class AuthService {
       userData.createdBy = request.email;
       userData.password = hashedPassword;
       userData.referralCode = `ref${generateUniqueCode()}`;
-      userData.withdrawDate = addDaysToCurrentDate(30);
+      userData.withdrawDate = nextWithdrawalDate(new Date());
 
       const saved = await queryRunner.manager.save(UserEntity, userData);
 
