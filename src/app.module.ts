@@ -16,6 +16,7 @@ import { UserService } from './modules/user/user.service';
 import { VerificationModule } from './modules/verification/verification.module';
 import { WithdrawalsModule } from './modules/withdrawals/withdrawal.module';
 import { SeedsModule } from './seeds/seeds.module';
+import { EmailService } from './services/email/email.service';
 import { JobTaskModule } from './services/task-jobs/task-jobs.module';
 import { HttpRequestService } from './utils/http-request';
 
@@ -36,6 +37,6 @@ import { HttpRequestService } from './utils/http-request';
     JobTaskModule,
   ],
   controllers: [AppController],
-  providers: [AppService, HttpRequestService, TransactionService, UserService],
+  providers: [AppService, HttpRequestService, TransactionService, UserService, EmailService],
 })
 export class AppModule { }

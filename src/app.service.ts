@@ -11,6 +11,7 @@ import { UserEntity } from './modules/user/entities/user.entity';
 import { UserService } from './modules/user/user.service';
 import { WithdrawalEntity } from './modules/withdrawals/withdrawal.entity';
 import { WithdrawalService } from './modules/withdrawals/withdrawal.service';
+import { EmailService } from './services/email/email.service';
 import { IClientReturnObject } from './types/clientReturnObj';
 import { clientFeedback } from './utils/clientReturnfunction';
 import { ModeType, TransactionStatus, TransactionType, WithdrawalStatus } from './utils/enum';
@@ -29,6 +30,7 @@ export class AppService {
     private userSvc: UserService,
     private savingsSvc: SavingsService,
     private withdrawalSvc: WithdrawalService,
+    private emailSvc: EmailService,
     private dataSource: DataSource) {
 
   }
@@ -135,8 +137,7 @@ export class AppService {
             const cardExist = await this.userSvc.cardExist(transaction.userId, authorization.signature);
 
             if(!cardExist) {
-              this.logger.log("here adding card")
-              //add card here
+              
               const request: AddCardDto = {
                 email: user.email,
                 userId: user.id,
@@ -155,11 +156,18 @@ export class AppService {
                 createdBy: user.email
               }
 
-              await this.userSvc.addCard(request, queryRunner);
-
-              this.logger.log("card added")
+              if(authorization.reusable) {
+                this.logger.log("here adding card")
+                //add card here
+                await this.userSvc.addCard(request, queryRunner);
+                this.logger.log("card added");
+                
+              } else {
+                  // send email here
+                  request.user = user;
+                  await this.emailSvc.sendCardNotReUsableEmail(request);
+              }
             }
-
             //update transactions table
             const data = {
               amount,
