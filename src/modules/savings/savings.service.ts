@@ -230,21 +230,22 @@ export class SavingsService {
     let savingType = await this.adminSvc.getStepUpSavingsType();
 
     for (const s of usersInAutoSave) {
-      this.logger.log(
-        `Running Auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email}`,
-      );
       const card = await this.cardRepo.findOne({
         where: { id: s.cardId, userId: s.userId, reusable: true },
       });
 
       if (card) {
 
+        this.logger.log(
+          `Running Auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email}`,
+        );
+
         if(s.retryBy) {
           const retryByTime = new Date(s.retryBy).getTime();
           const today = new Date().getTime();
           if(today < retryByTime) {
             this.logger.warn(
-              `Could not run auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email} because retryby time has not reached`,
+              `Could not run auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email} because retryby ${s.retryBy} time has not reached`,
             );
             continue;
           }  
