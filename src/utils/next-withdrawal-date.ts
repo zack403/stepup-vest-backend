@@ -3,7 +3,7 @@ export const nextWithdrawalDate = (currentWithdrawalDate) => {
     const currentToDate = new Date(currentWithdrawalDate);
     const today = new Date();
     let nextWithdrawalDate;
-    if (today.getDate() > currentToDate.getDate()) {
+    if (today.getDate() >= currentToDate.getDate()) {
       nextWithdrawalDate = new Date(
         currentToDate.getFullYear(),
         currentToDate.getMonth() + 1,
@@ -12,7 +12,7 @@ export const nextWithdrawalDate = (currentWithdrawalDate) => {
     } else {
       nextWithdrawalDate = new Date(
         today.getFullYear(),
-        today.getMonth() + 1,
+        today.getMonth(),
         currentToDate.getDate()
       );
     }

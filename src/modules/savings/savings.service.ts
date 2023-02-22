@@ -238,6 +238,18 @@ export class SavingsService {
       });
 
       if (card) {
+
+        if(s.retryBy) {
+          const retryByTime = new Date(s.retryBy).getTime();
+          const today = new Date().getTime();
+          if(today < retryByTime) {
+            this.logger.warn(
+              `Could not run auto save for ${s.user.firstName} ${s.user.lastName} ${s.user.email} because retryby time has not reached`,
+            );
+            continue;
+          }  
+        }
+        
         const p = {
           authorization_code: card.authorizationCode,
           email: s.user.email,
@@ -274,12 +286,24 @@ export class SavingsService {
               );
               
               const rs = await this.populateNextSavingDate(s, s);
+
+              if(rs.retryBy) {
+                rs.retryBy = null;
+              }
               await queryRunner.manager.save(UserSettingEntity, rs);
 
               await this.checkIfReferralCanClaimBonus(s.user);
               this.logger.log(
                 `Running Auto save for ${s.user.firstName} ${s.user.lastName} was successful`,
               );
+
+            } else if (data.status === 'failed') {
+              if(data.message.includes('Charge cannot be fulfilled until')) {
+                if(data.retryBy) {
+                  s.retryBy = data.retryBy;
+                  await this.userSetRepo.save(s);
+                }
+              }
             }
           }
         }

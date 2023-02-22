@@ -172,7 +172,13 @@ export class HttpRequestService {
       
     } catch (error) {
         this.logger.error(`${error.response.data.message}`, `error in paystack recurring charge - ${error}`, `${error}`)
-
+        return {
+          data: {
+            status: 'failed',
+            message: error.response.data.message,
+            retryBy: error.response.data?.data?.retry_by
+          }
+        }
     }
   }
 

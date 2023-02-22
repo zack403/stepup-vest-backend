@@ -36,6 +36,9 @@ export class UserSettingEntity extends AbstractBaseEntity {
 
   @Column({ type: 'timestamp', nullable: true})
   nextSaveDate: Date;
+
+  @Column({ type: 'timestamp', nullable: true})
+  retryBy: Date;
   
   @ManyToOne(() => UserEntity)
   user: UserEntity;
