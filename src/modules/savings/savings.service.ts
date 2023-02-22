@@ -299,7 +299,7 @@ export class SavingsService {
               );
 
             } else if (data.status === 'failed') {
-              if(data.message.includes('Charge cannot be fulfilled until')) {
+              if(data.message.includes('Charge attempt cannot be fulfilled until')) {
                 if(data.retryBy) {
                   s.retryBy = data.retryBy;
                   await this.userSetRepo.save(s);
