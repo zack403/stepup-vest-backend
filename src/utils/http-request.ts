@@ -171,8 +171,8 @@ export class HttpRequestService {
         return result;
       
     } catch (error) {
-      this.logger.error(error);
-       this.logger.error(error.response);
+        console.log(error);
+        console.log(error.response);
         this.logger.error(`${error.response.data.message}`, `error in paystack recurring charge - ${error}`, `${error}`)
         return {
           data: {
