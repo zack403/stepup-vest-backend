@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EmailService } from 'src/services/email/email.service';
 import { IClientReturnObject } from 'src/types/clientReturnObj';
 import { clientFeedback } from 'src/utils/clientReturnfunction';
 import {
@@ -38,6 +39,7 @@ export class SavingsService {
     private readonly httpReqSvc: HttpRequestService,
     @InjectRepository(SavingsEntity)
     private saveRepo: Repository<SavingsEntity>,
+    private emailSvc: EmailService
   ) { }
 
   async getSavingsByType(
@@ -232,6 +234,7 @@ export class SavingsService {
     for (const s of usersInAutoSave) {
       const card = await this.cardRepo.findOne({
         where: { id: s.cardId, userId: s.userId, reusable: true },
+        relations: ['user']
       });
 
       if (card) {
@@ -302,9 +305,13 @@ export class SavingsService {
               if(data?.message?.includes('Charge attempt cannot be fulfilled until')) {
                 if(data.retryBy) {
                   s.retryBy = data.retryBy;
-                  await this.userSetRepo.save(s);
+                  return await this.userSetRepo.save(s);
                 }
               }
+
+              this.logger.log("sending email for unable to charge card");
+              //send email
+              await this.emailSvc.sendCardIssueEmail(card);
             }
           }
         }

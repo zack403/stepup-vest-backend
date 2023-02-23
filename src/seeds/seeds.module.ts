@@ -6,6 +6,7 @@ import { SavingsService } from "src/modules/savings/savings.service";
 import { TransactionService } from "src/modules/transactions/transaction.service";
 import { UserModule } from "src/modules/user/user.module";
 import { UserService } from "src/modules/user/user.service";
+import { EmailService } from "src/services/email/email.service";
 import { HttpRequestService } from "src/utils/http-request";
 import { SeedsService } from "./seeds.service";
 
@@ -16,7 +17,7 @@ import { SeedsService } from "./seeds.service";
         AdminModule,
         HttpModule
     ],
-    providers: [SeedsService, UserService, AdminService, SavingsService, TransactionService, HttpRequestService]
+    providers: [SeedsService, UserService, AdminService, SavingsService, TransactionService, EmailService, HttpRequestService]
 })
 
 export class SeedsModule {}

@@ -12,7 +12,7 @@ export class AutoSaveService {
     private dataSource: DataSource,
   ) { }
 
-  @Cron(CronExpression.EVERY_30_MINUTES)
+  @Cron(CronExpression.EVERY_30_MINUTES, {timeZone: 'Africa/Lagos'})
   async handle() {
 
     this.logger.log('Auto saving service started');

@@ -13,6 +13,7 @@ import { UserEntity } from '../user/entities/user.entity';
 import { UserSettingEntity } from '../user/entities/setting.entity';
 import { CardEntity } from '../user/entities/card.entity';
 import { HttpRequestService } from 'src/utils/http-request';
+import { EmailModule } from 'src/services/email/email.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { HttpRequestService } from 'src/utils/http-request';
     HttpModule,
     AuthModule,
     AdminModule,
-    TransactionModule
+    TransactionModule,
+    EmailModule
   ],
   controllers: [SavingsController],
   providers: [SavingsService, AdminService, TransactionService, HttpRequestService],

@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer'
+import { CardEntity } from 'src/modules/user/entities/card.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
+import { CardIssueEmail } from './templates/card-issue-email-template';
 import { CardNotReuseableEmail } from './templates/card-not-reuseable-template';
 import { ConfirmEmail } from './templates/confirm-email-template';
 import { ResetPasswordEmail } from './templates/reset-password-template';
@@ -77,6 +79,22 @@ export class EmailService {
         subject: 'New added card cannot be used',
         text: CardNotReuseableEmail(request.user, request),
         html: CardNotReuseableEmail(request.user, request),
+        headers: { 'x-myheader': 'test header' }
+      });
+    } catch (error) {
+      console.log(error);      
+      Logger.error(`NODE-MAILER.sendHtmlMailAsync: ${error.toString()}`);
+    }
+  }
+
+  public sendCardIssueEmail = async (card: CardEntity) => {
+    try {
+      await this.transporter.sendMail({
+        from: this.configService.get('EMAIL_FROM'),
+        to: card.email,
+        subject: 'Unable to charge your card',
+        text: CardIssueEmail(card.user, card),
+        html: CardIssueEmail(card.user, card),
         headers: { 'x-myheader': 'test header' }
       });
     } catch (error) {

@@ -13,6 +13,7 @@ import { AdminService } from '../admin/admin.service';
 import { SavingsModule } from '../savings/savings.module';
 import { AdminModule } from '../admin/admin.module';
 import { WithdrawalsModule } from '../withdrawals/withdrawal.module';
+import { EmailService } from 'src/services/email/email.service';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { WithdrawalsModule } from '../withdrawals/withdrawal.module';
     HttpRequestService, 
     SavingsService, 
     AdminService, 
-    TransactionService
+    TransactionService,
+    EmailService
   ]
 })
 export class VerificationModule {}

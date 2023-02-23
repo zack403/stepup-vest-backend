@@ -17,6 +17,7 @@ import { HttpRequestService } from 'src/utils/http-request';
 import { HttpModule } from '@nestjs/axios';
 import { WithdrawalEntity } from '../withdrawals/withdrawal.entity';
 import { UserSettingEntity } from './entities/setting.entity';
+import { EmailService } from 'src/services/email/email.service';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { UserSettingEntity } from './entities/setting.entity';
     HttpModule
   ],
   controllers: [UserController],
-  providers: [UserService, SavingsService, AdminService, TransactionService, HttpRequestService],
+  providers: [UserService, SavingsService, AdminService, TransactionService, HttpRequestService, EmailService],
   exports: [ TypeOrmModule, UserService]
 })
 export class UserModule {}
