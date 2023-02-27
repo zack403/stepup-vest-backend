@@ -40,7 +40,7 @@ export class UpdateNextWithdrawalDateService {
         return null;
       }
 
-      return new Date( today.getMonth() === 11 ? today.getFullYear() + 1 :
+      return new Date(
         today.getFullYear(),
         today.getMonth() + 1,
         currentToDate.getDate()
