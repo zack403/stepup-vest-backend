@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression  } from '@nestjs/schedule';
 import { UserService } from 'src/modules/user/user.service';
-import { nextWithdrawalDate } from 'src/utils/next-withdrawal-date';
 
 
 @Injectable()
@@ -22,13 +21,30 @@ export class UpdateNextWithdrawalDateService {
         
         const users = await this.userSvc.getAllUsers();
         for (const u of users) {
-            u.withdrawDate = nextWithdrawalDate(u.withdrawDate);
+          if(this.setWithdrawalDate(u.withdrawDate)) {
+            u.withdrawDate = this.setWithdrawalDate(u.withdrawDate);
             await this.userSvc.saveOrUpdateUser(u);
+          }
         }
   
       } catch (error) {
         this.logger.error(error);
       }
+
+    }
+
+    setWithdrawalDate = (date) => {
+      const currentToDate = new Date(date);
+      const today = new Date();
+      if (today.setHours(0,0,0,0) <= currentToDate.setHours(0,0,0,0)) {
+        return null;
+      }
+
+      return new Date( today.getMonth() === 11 ? today.getFullYear() + 1 :
+        today.getFullYear(),
+        today.getMonth() + 1,
+        currentToDate.getDate()
+      );
 
     }
 }

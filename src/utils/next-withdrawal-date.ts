@@ -3,7 +3,8 @@ export const nextWithdrawalDate = (currentWithdrawalDate) => {
     const currentToDate = new Date(currentWithdrawalDate);
     const today = new Date();
     let nextWithdrawalDate;
-    if (today.getDate() >= currentToDate.getDate()) {
+    if (today.setHours(0,0,0,0) >= currentToDate.setHours(0,0,0,0)) {
+      
       nextWithdrawalDate = new Date(
         currentToDate.getFullYear(),
         currentToDate.getMonth() + 1,
