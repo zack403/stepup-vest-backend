@@ -8,17 +8,6 @@ import { CardNotReuseableEmail } from './templates/card-not-reuseable-template';
 import { ConfirmEmail } from './templates/confirm-email-template';
 import { ResetPasswordEmail } from './templates/reset-password-template';
 
-export interface ITransctionNotification {
-  subject: string;
-  to: {
-    email: string;
-    businessName: string;
-    businessId: string;
-  };
-  link: string;
-  message: string;
-  unsubcribeLink: string;
-}
 
 @Injectable()
 export class EmailService {

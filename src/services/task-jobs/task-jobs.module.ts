@@ -13,8 +13,8 @@ import { UpdateNextWithdrawalDateService } from './update-next-withdrawal-date';
     UserModule
   ],
   providers: [
-    InitiateTransferService, 
-    AutoSaveService, 
+    //InitiateTransferService, 
+    //AutoSaveService, 
     UpdateNextWithdrawalDateService
   ],
 })
